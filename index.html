@@ -503,37 +503,18 @@ function groupByTier(secs){
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
-const SESSION_MAX=6;
-const SESSIONS=(()=>{
-  const perMod=MOD_ORDER.map(mid=>{
-    const m=byId[mid];if(!m)return null;
-    const secsT=m.secs.map(s=>Object.assign({},s,{tier:sectionTier(s.t)}));
-    let end=secsT.length;
-    while(end>0&&secsT[end-1].tier===4)end--;
-    const body=secsT.slice(0,end),tail=secsT.slice(end);
-    const chunks=[];let chunk=[];
-    body.forEach(s=>{
-      if(s.tier===1&&chunk.length){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
-      chunk.push(s);
-      if(chunk.length>=SESSION_MAX){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
-    });
-    if(chunk.length)chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});
-    if(tail.length)chunks.push({secs:tail,tier:4});
-    return {mod:m,chunks};
-  }).filter(Boolean);
+const LESSONS=(()=>{
+  const perMod=MOD_ORDER.map(mid=>{const m=byId[mid];return m?{mod:m,secs:m.secs}:null;}).filter(Boolean);
   const out=[];
-  const maxRounds=Math.max.apply(null,perMod.map(p=>p.chunks.length));
-  for(let round=0;round<maxRounds;round++){
+  const maxLen=Math.max.apply(null,perMod.map(p=>p.secs.length));
+  for(let round=0;round<maxLen;round++){
     perMod.forEach(p=>{
-      if(round<p.chunks.length){const c=p.chunks[round];out.push({secs:c.secs,mod:p.mod,tier:c.tier});}
+      if(round<p.secs.length){const sec=p.secs[round];out.push({sec,mod:p.mod,tier:sectionTier(sec.t)});}
     });
   }
-  const byMod={};out.forEach(s=>{byMod[s.mod.id]=(byMod[s.mod.id]||0)+1;});
-  const seen={};out.forEach((s,idx)=>{s.n=idx+1;seen[s.mod.id]=(seen[s.mod.id]||0)+1;s.part=seen[s.mod.id];s.parts=byMod[s.mod.id];});
+  out.forEach((x,i)=>x.n=i+1);
   return out;
 })();
-const sessionDone=s=>s.secs.every(x=>S.sec[x.id]);
-const sessionProgress=s=>s.secs.filter(x=>S.sec[x.id]).length;
 function countCallsBefore(blocks,targetIdx){
   let n=0;
   const rec=b=>{let c=b.t==='call'?1:0;if(b.t==='call')c+=b.blocks.reduce((a,x)=>a+rec(x),0);return c;};
@@ -677,34 +658,29 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
 
 /* ---------- pages ---------- */
 function renderHome(){
-  let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
-  const allS=allSecs(),totalAulas=allS.length,doneAulas=allS.filter(x=>S.sec[x.id]).length;
+  let streak=0;for(const l of LESSONS){if(S.sec[l.sec.id])streak++;else break;}
+  const total=LESSONS.length;
   let stopsHTML='',lede;
-  if(streak>=SESSIONS.length){
-    lede=`Você concluiu as ${SESSIONS.length} sessões da trilha — ${totalAulas} aulas ao todo. 🎉`;
+  if(streak>=total){
+    lede=`Você concluiu as ${total} aulas da trilha. 🎉`;
   }else{
-    const visible=SESSIONS.slice(streak,streak+10);
-    stopsHTML=visible.map((s,i)=>{
-      const isDone=sessionDone(s),isCur=i===0;
+    const visible=LESSONS.slice(streak,streak+10);
+    stopsHTML=visible.map((l,i)=>{
+      const isDone=!!S.sec[l.sec.id],isCur=i===0;
       const state=isDone?'done':isCur?'cur':'';
-      const k=sessionProgress(s),n=s.secs.length;
-      const nextSec=s.secs.find(x=>!S.sec[x.id])||s.secs[0];
-      const name=`${esc(s.mod.short)} — ${esc(TIER_LABEL[s.tier])}`;
-      let meta;
-      if(isDone)meta=`${n} aula${n===1?'':'s'} concluída${n===1?'':'s'}`;
-      else if(isCur)meta=`aula ${k+1} de ${n} · ${esc(nextSec.t)}`;
-      else meta=`${n} aula${n===1?'':'s'}`;
+      const name=esc((l.sec.n?l.sec.n+' ':'')+l.sec.t);
+      const meta=`${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
       let right;
       if(isDone)right='<span class="pill">concluído</span>';
-      else if(isCur)right=`<a class="go" href="#/u/${s.mod.id}/${nextSec.id}">Continuar →</a>`;
+      else if(isCur)right=`<a class="go" href="#/u/${l.mod.id}/${l.sec.id}">Continuar →</a>`;
       else if(i===1)right='<span class="pill">a seguir</span>';
       else right='<span class="pill">bloqueado</span>';
       const node=isDone?'✓':isCur?'●':String(i+1);
-      return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${s.mod.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
+      return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${l.mod.id}/${l.sec.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
     }).join('');
-    lede=`Analista de Dados · ${doneAulas} de ${totalAulas} aulas concluídas.`;
+    lede=`Analista de Dados · ${streak} de ${total} aulas concluídas.`;
   }
-  V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${SESSIONS.length}</div><div>
+  V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
   <h1>Cronograma de estudos</h1>
   <p class="lede">${lede}</p>
   </div></div></div>
