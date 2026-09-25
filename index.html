@@ -371,8 +371,54 @@ const byId={};U.forEach(u=>byId[u.id]=u);
 const MODS=U.filter(u=>u.kind==='mod');
 const allSecs=()=>U.flatMap(u=>u.secs);
 const secDone=u=>u.secs.filter(s=>S.sec[s.id]).length;
-const SESSION_SIZE=5;
-const SESSIONS=(()=>{const out=[];let n=0;MODS.forEach(m=>{const chunks=[];for(let i=0;i<m.secs.length;i+=SESSION_SIZE)chunks.push(m.secs.slice(i,i+SESSION_SIZE));chunks.forEach((secs,idx)=>{n++;out.push({n,mod:m,part:idx+1,parts:chunks.length,secs});});});return out;})();
+function sectionTier(t){
+  const s=t.toLowerCase();
+  if(/exerc[íi]cio|mini-projeto|autoavalia|gabarito/.test(s))return 4;
+  if(/otimiz|avan[çc]ad|estrat[ée]gia|motor do|vertipaq|plano de consulta|monte carlo|probabilidade|regress[ãa]o|anova|s[ée]rie(s)? temporai?s|fila(s)?|precifica[çc][ãa]o|op[çc][õo]es|causal|ensemble|hierarquia|engenharia anal[íi]tica|conclus[ãa]o|deploy|produ[çc][ãa]o|seguran[çc]a|governan[çc]a|arquitetura/.test(s))return 3;
+  if(/^o que [ée]|introdu[çc][ãa]o|fundamentos|primeiros passos|apresenta[çc][ãa]o|objetivo|panorama|^por que/.test(s))return 1;
+  return 2;
+}
+const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
+const MOD_WHY={
+  m1:'Primeiro módulo da trilha — entender o papel do analista e a linguagem básica de dados e negócio.',
+  m2:'Depois dos fundamentos, o primeiro ferramental: Excel é onde a maioria dos analistas começa a manipular dados de verdade.',
+  m4:'Com o Excel dominado, SQL amplia a mesma lógica de tabelas para bases de dados reais e volumes maiores.',
+  m6:'Python fecha o tripé de ferramentas (Excel, SQL, Python) antes de entrar em teoria estatística mais pesada.',
+  m3:'Com as ferramentas em mãos, agora a base teórica: estatística sustenta qualquer análise ou modelo daqui em diante.',
+  m7:'Ferramentas e estatística prontas — hora de aprender a garantir que os dados que você analisa são confiáveis.',
+  m13:'Aprofunda o SQL e o Power Query dos módulos anteriores num cenário real de banco de dados e pipelines de ETL.',
+  m5:'Com dados limpos e modelados, o próximo passo natural é comunicá-los: visualização e BI.',
+  m15:'Depois de aprender a criar dashboards, o passo seguinte é publicá-los e mantê-los em produção.',
+  m8:'Fecha o ferramental técnico com ferramentas complementares do dia a dia do analista.',
+  m11:'Com estatística, Python e dados limpos dominados, é hora de usar IA e machine learning como analista.',
+  m12:'Tópicos avançados que aprofundam tudo o que veio antes — a trilha de maestria técnica.',
+  m14:'Depois da profundidade técnica, o contexto de negócio: como finanças e métricas de empresa se conectam ao seu trabalho.',
+  m9:'Com a base técnica e de negócio completa, hora das habilidades que decidem quem cresce na carreira: comunicação, ética, liderança.',
+  m10:'Módulo final: transformar tudo o que foi estudado em portfólio e em uma candidatura de verdade.'
+};
+const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
+const SESSION_MAX=6;
+const SESSIONS=(()=>{
+  const out=[];
+  MOD_ORDER.forEach(mid=>{
+    const m=byId[mid];if(!m)return;
+    const secsT=m.secs.map(s=>Object.assign({},s,{tier:sectionTier(s.t)}));
+    let end=secsT.length;
+    while(end>0&&secsT[end-1].tier===4)end--;
+    const body=secsT.slice(0,end),tail=secsT.slice(end);
+    let chunk=[];
+    body.forEach(s=>{
+      if(s.tier===1&&chunk.length){out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+      chunk.push(s);
+      if(chunk.length>=SESSION_MAX){out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+    });
+    if(chunk.length)out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});
+    if(tail.length)out.push({secs:tail,mod:m,tier:4});
+  });
+  const byMod={};out.forEach(s=>{byMod[s.mod.id]=(byMod[s.mod.id]||0)+1;});
+  const seen={};out.forEach((s,idx)=>{s.n=idx+1;seen[s.mod.id]=(seen[s.mod.id]||0)+1;s.part=seen[s.mod.id];s.parts=byMod[s.mod.id];});
+  return out;
+})();
 const sessionDone=s=>s.secs.every(x=>S.sec[x.id]);
 const sessionProgress=s=>s.secs.filter(x=>S.sec[x.id]).length;
 
@@ -519,17 +565,22 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
 
 /* ---------- pages ---------- */
 function sessionCorrelation(s,i){
-  if(i===0)return 'Primeira sessão da trilha — o ponto de partida de tudo.';
+  if(i===0)return MOD_WHY[s.mod.id]||'Primeira sessão da trilha — o ponto de partida de tudo.';
   const prev=SESSIONS[i-1];
-  if(prev.mod.id!==s.mod.id)return `Abre o ${esc(s.mod.short)} — recomendado depois de concluir o ${esc(prev.mod.short)}.`;
-  return `Continua direto da Sessão ${prev.n}, dentro do ${esc(s.mod.short)}.`;
+  if(prev.mod.id!==s.mod.id)return MOD_WHY[s.mod.id]||`Abre o ${esc(s.mod.short)} — recomendado depois de concluir o ${esc(prev.mod.short)}.`;
+  if(s.tier===4)return `Conteúdo do ${esc(s.mod.short)} concluído — hora de praticar e se autoavaliar.`;
+  if(prev.tier<s.tier){
+    const msg={2:'Fundamentos vistos — agora é hora de aplicar na prática',3:'Você já praticou — agora entram os tópicos avançados'}[s.tier]||'Avançando de nível';
+    return `${msg} no ${esc(s.mod.short)}.`;
+  }
+  return `Continua direto da Sessão ${prev.n}, ainda em "${TIER_LABEL[s.tier]}" no ${esc(s.mod.short)}.`;
 }
 function renderCurrentSession(){
   if(!SESSIONS.length)return '';
   let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
   if(streak>=SESSIONS.length)return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Você concluiu as ${SESSIONS.length} sessões da trilha completa. 🎉</p></div>`;
   const s=SESSIONS[streak],i=streak,prog=sessionProgress(s);
-  const card=`<div class="sescard cur" style="--mc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" style="--mc:${s.mod.color}" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
+  const card=`<div class="sescard cur" style="--mc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" style="--mc:${s.mod.color}" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
   return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como estudadas, a próxima sobe automaticamente para cá.</p>${card}</div>`;
 }
 function renderHome(){
