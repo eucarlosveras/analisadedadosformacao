@@ -399,22 +399,29 @@ const MOD_WHY={
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
 const SESSION_MAX=6;
 const SESSIONS=(()=>{
-  const out=[];
-  MOD_ORDER.forEach(mid=>{
-    const m=byId[mid];if(!m)return;
+  const perMod=MOD_ORDER.map(mid=>{
+    const m=byId[mid];if(!m)return null;
     const secsT=m.secs.map(s=>Object.assign({},s,{tier:sectionTier(s.t)}));
     let end=secsT.length;
     while(end>0&&secsT[end-1].tier===4)end--;
     const body=secsT.slice(0,end),tail=secsT.slice(end);
-    let chunk=[];
+    const chunks=[];let chunk=[];
     body.forEach(s=>{
-      if(s.tier===1&&chunk.length){out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+      if(s.tier===1&&chunk.length){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
       chunk.push(s);
-      if(chunk.length>=SESSION_MAX){out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+      if(chunk.length>=SESSION_MAX){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
     });
-    if(chunk.length)out.push({secs:chunk,mod:m,tier:Math.max.apply(null,chunk.map(x=>x.tier))});
-    if(tail.length)out.push({secs:tail,mod:m,tier:4});
-  });
+    if(chunk.length)chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});
+    if(tail.length)chunks.push({secs:tail,tier:4});
+    return {mod:m,chunks};
+  }).filter(Boolean);
+  const out=[];
+  const maxRounds=Math.max.apply(null,perMod.map(p=>p.chunks.length));
+  for(let round=0;round<maxRounds;round++){
+    perMod.forEach(p=>{
+      if(round<p.chunks.length){const c=p.chunks[round];out.push({secs:c.secs,mod:p.mod,tier:c.tier});}
+    });
+  }
   const byMod={};out.forEach(s=>{byMod[s.mod.id]=(byMod[s.mod.id]||0)+1;});
   const seen={};out.forEach((s,idx)=>{s.n=idx+1;seen[s.mod.id]=(seen[s.mod.id]||0)+1;s.part=seen[s.mod.id];s.parts=byMod[s.mod.id];});
   return out;
@@ -565,15 +572,9 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
 
 /* ---------- pages ---------- */
 function sessionCorrelation(s,i){
-  if(i===0)return MOD_WHY[s.mod.id]||'Primeira sessão da trilha — o ponto de partida de tudo.';
-  const prev=SESSIONS[i-1];
-  if(prev.mod.id!==s.mod.id)return MOD_WHY[s.mod.id]||`Abre o ${esc(s.mod.short)} — recomendado depois de concluir o ${esc(prev.mod.short)}.`;
-  if(s.tier===4)return `Conteúdo do ${esc(s.mod.short)} concluído — hora de praticar e se autoavaliar.`;
-  if(prev.tier<s.tier){
-    const msg={2:'Fundamentos vistos — agora é hora de aplicar na prática',3:'Você já praticou — agora entram os tópicos avançados'}[s.tier]||'Avançando de nível';
-    return `${msg} no ${esc(s.mod.short)}.`;
-  }
-  return `Continua direto da Sessão ${prev.n}, ainda em "${TIER_LABEL[s.tier]}" no ${esc(s.mod.short)}.`;
+  if(s.part===1)return MOD_WHY[s.mod.id]||`Primeira sessão do ${esc(s.mod.short)}.`;
+  if(s.tier===4)return `Fecha o conteúdo do ${esc(s.mod.short)} por enquanto — hora de praticar e se autoavaliar nele.`;
+  return `Retomando o ${esc(s.mod.short)} (parte ${s.part} de ${s.parts}) — intercalado com os outros assuntos para não ficar repetitivo.`;
 }
 function renderCurrentSession(){
   if(!SESSIONS.length)return '';
