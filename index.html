@@ -503,23 +503,6 @@ function groupByTier(secs){
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
-const MOD_WHY={
-  m1:'Primeiro módulo da trilha — entender o papel do analista e a linguagem básica de dados e negócio.',
-  m2:'Depois dos fundamentos, o primeiro ferramental: Excel é onde a maioria dos analistas começa a manipular dados de verdade.',
-  m4:'Com o Excel dominado, SQL amplia a mesma lógica de tabelas para bases de dados reais e volumes maiores.',
-  m6:'Python fecha o tripé de ferramentas (Excel, SQL, Python) antes de entrar em teoria estatística mais pesada.',
-  m3:'Com as ferramentas em mãos, agora a base teórica: estatística sustenta qualquer análise ou modelo daqui em diante.',
-  m7:'Ferramentas e estatística prontas — hora de aprender a garantir que os dados que você analisa são confiáveis.',
-  m13:'Aprofunda o SQL e o Power Query dos módulos anteriores num cenário real de banco de dados e pipelines de ETL.',
-  m5:'Com dados limpos e modelados, o próximo passo natural é comunicá-los: visualização e BI.',
-  m15:'Depois de aprender a criar dashboards, o passo seguinte é publicá-los e mantê-los em produção.',
-  m8:'Fecha o ferramental técnico com ferramentas complementares do dia a dia do analista.',
-  m11:'Com estatística, Python e dados limpos dominados, é hora de usar IA e machine learning como analista.',
-  m12:'Tópicos avançados que aprofundam tudo o que veio antes — a trilha de maestria técnica.',
-  m14:'Depois da profundidade técnica, o contexto de negócio: como finanças e métricas de empresa se conectam ao seu trabalho.',
-  m9:'Com a base técnica e de negócio completa, hora das habilidades que decidem quem cresce na carreira: comunicação, ética, liderança.',
-  m10:'Módulo final: transformar tudo o que foi estudado em portfólio e em uma candidatura de verdade.'
-};
 const SESSION_MAX=6;
 const SESSIONS=(()=>{
   const perMod=MOD_ORDER.map(mid=>{
@@ -551,19 +534,6 @@ const SESSIONS=(()=>{
 })();
 const sessionDone=s=>s.secs.every(x=>S.sec[x.id]);
 const sessionProgress=s=>s.secs.filter(x=>S.sec[x.id]).length;
-function sessionCorrelation(s,i){
-  if(s.part===1)return MOD_WHY[s.mod.id]||`Primeira sessão do ${esc(s.mod.short)}.`;
-  if(s.tier===4)return `Fecha o conteúdo do ${esc(s.mod.short)} por enquanto — hora de praticar e se autoavaliar nele.`;
-  return `Retomando o ${esc(s.mod.short)} (parte ${s.part} de ${s.parts}) — intercalado com os outros assuntos para não ficar repetitivo.`;
-}
-function renderCurrentSession(){
-  if(!SESSIONS.length)return '';
-  let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
-  if(streak>=SESSIONS.length)return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Você concluiu as ${SESSIONS.length} sessões da trilha completa. 🎉</p></div>`;
-  const s=SESSIONS[streak],i=streak,prog=sessionProgress(s);
-  const card=`<div class="sescard cur" style="--dotc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
-  return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como concluídas, a próxima sobe automaticamente para cá.</p>${card}</div>`;
-}
 function countCallsBefore(blocks,targetIdx){
   let n=0;
   const rec=b=>{let c=b.t==='call'?1:0;if(b.t==='call')c+=b.blocks.reduce((a,x)=>a+rec(x),0);return c;};
@@ -707,35 +677,38 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
 
 /* ---------- pages ---------- */
 function renderHome(){
-  const ordered=MOD_ORDER.map(id=>byId[id]).filter(Boolean);
-  const curIdx=ordered.findIndex(m=>!S.done[m.id]);
-  const totalAulas=ordered.reduce((a,m)=>a+m.secs.length,0);
-  const doneAulas=ordered.reduce((a,m)=>a+secDone(m),0);
-  const doneCursos=ordered.filter(m=>S.done[m.id]).length;
-  const stops=ordered.map((m,i)=>{
-    const isDone=!!S.done[m.id];
-    const isCur=!isDone&&i===curIdx;
-    const state=isDone?'done':isCur?'cur':'';
-    const k=secDone(m),n=m.secs.length;
-    const nextSec=m.secs.find(s=>!S.sec[s.id]);
-    let meta;
-    if(isDone)meta=`${n} aula${n===1?'':'s'} concluída${n===1?'':'s'}`;
-    else if(isCur)meta=nextSec?`aula ${k+1} de ${n} · ${esc(nextSec.t)}`:`${n} aula${n===1?'':'s'}`;
-    else meta=`${n} aula${n===1?'':'s'}`;
-    let right;
-    if(isDone)right='<span class="pill">concluído</span>';
-    else if(isCur)right=`<a class="go" href="#/u/${m.id}${nextSec?'/'+nextSec.id:''}">Continuar →</a>`;
-    else if(curIdx>=0&&i===curIdx+1)right='<span class="pill">a seguir</span>';
-    else right='<span class="pill">bloqueado</span>';
-    const node=isDone?'✓':isCur?'●':String(i+1);
-    return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${m.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${esc(m.title)}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
-  }).join('');
-  const lede=curIdx<0?`Você concluiu os 15 módulos da trilha — ${totalAulas} aulas ao todo. 🎉`:`Analista de Dados · 15 módulos · ${totalAulas} aulas no total · ${doneAulas} de ${totalAulas} aulas concluídas.`;
-  V.innerHTML=`${renderCurrentSession()}<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${doneCursos}/15</div><div>
-  <h1>Sua trilha</h1>
+  let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
+  const allS=allSecs(),totalAulas=allS.length,doneAulas=allS.filter(x=>S.sec[x.id]).length;
+  let stopsHTML='',lede;
+  if(streak>=SESSIONS.length){
+    lede=`Você concluiu as ${SESSIONS.length} sessões da trilha — ${totalAulas} aulas ao todo. 🎉`;
+  }else{
+    const visible=SESSIONS.slice(streak,streak+10);
+    stopsHTML=visible.map((s,i)=>{
+      const isDone=sessionDone(s),isCur=i===0;
+      const state=isDone?'done':isCur?'cur':'';
+      const k=sessionProgress(s),n=s.secs.length;
+      const nextSec=s.secs.find(x=>!S.sec[x.id])||s.secs[0];
+      const name=`${esc(s.mod.short)} — ${esc(TIER_LABEL[s.tier])}`;
+      let meta;
+      if(isDone)meta=`${n} aula${n===1?'':'s'} concluída${n===1?'':'s'}`;
+      else if(isCur)meta=`aula ${k+1} de ${n} · ${esc(nextSec.t)}`;
+      else meta=`${n} aula${n===1?'':'s'}`;
+      let right;
+      if(isDone)right='<span class="pill">concluído</span>';
+      else if(isCur)right=`<a class="go" href="#/u/${s.mod.id}/${nextSec.id}">Continuar →</a>`;
+      else if(i===1)right='<span class="pill">a seguir</span>';
+      else right='<span class="pill">bloqueado</span>';
+      const node=isDone?'✓':isCur?'●':String(i+1);
+      return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${s.mod.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
+    }).join('');
+    lede=`Analista de Dados · ${doneAulas} de ${totalAulas} aulas concluídas.`;
+  }
+  V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${SESSIONS.length}</div><div>
+  <h1>Cronograma de estudos</h1>
   <p class="lede">${lede}</p>
   </div></div></div>
-  <div class="metro">${stops}</div>
+  <div class="metro">${stopsHTML}</div>
   <p class="sub" style="margin-top:1.4rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>`;
 }
 function renderGuia(){
