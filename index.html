@@ -108,7 +108,7 @@ p,li{max-width:var(--measure)}
 .acell small{position:absolute;top:.55rem;left:.6rem;font-family:var(--f-mono);font-size:.62rem;font-weight:500;opacity:.85;letter-spacing:0;text-transform:uppercase}
 .hero h1{margin:0}
 .homehero .hero{align-items:start}
-.homehero h1{font-size:clamp(2.1rem,4.6vw,3.2rem);max-width:17ch;line-height:1.03}
+.homehero h1{font-size:clamp(1.6rem,3vw,2.1rem);max-width:17ch;line-height:1.03}
 .homehero .lede{font-size:1.1rem;max-width:56ch;margin:.8rem 0 1.2rem;color:var(--muted)}
 .homehero .acts{display:flex;gap:.6rem;flex-wrap:wrap}
 
@@ -167,7 +167,7 @@ p,li{max-width:var(--measure)}
 
 /* ===== pagina de aula ===== */
 .lesson-page{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:1.6rem}
-.lp-main{padding:1.8rem 2rem 2.2rem;border-right:1px solid var(--line);min-width:0}
+.lp-main{padding:1.8rem 2rem 2.2rem;min-width:0}
 .lp-eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.04em;color:var(--accent);margin-bottom:.6rem}
 .lp-nav{display:flex;justify-content:space-between;gap:.6rem;margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--line)}
 .navbtn{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:.55rem .85rem;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;min-height:38px}
@@ -662,7 +662,7 @@ function renderHome(){
   const total=LESSONS.length;
   let stopsHTML='',lede;
   if(streak>=total){
-    lede=`Você concluiu as ${total} aulas da trilha. 🎉`;
+    lede='Analista de Dados';
   }else{
     const visible=LESSONS.slice(streak,streak+10);
     stopsHTML=visible.map((l,i)=>{
@@ -678,7 +678,7 @@ function renderHome(){
       const node=isDone?'✓':isCur?'●':String(i+1);
       return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${l.mod.id}/${l.sec.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
     }).join('');
-    lede=`Analista de Dados · ${streak} de ${total} aulas concluídas.`;
+    lede='Analista de Dados';
   }
   V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
   <h1>Cronograma de estudos</h1>
