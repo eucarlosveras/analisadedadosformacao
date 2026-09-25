@@ -189,7 +189,7 @@ tbody tr:last-child td{border-bottom:0}
 
 textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:.65rem .75rem;line-height:1.55;resize:vertical}
 textarea:focus{background:var(--panel);border-color:var(--accent);outline:0;box-shadow:0 0 0 3px var(--accent-soft)}
-input[type=text],input[type=search],select{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:.4rem .7rem;min-height:40px}
+input[type=text],input[type=search],input[type=email],select{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:.4rem .7rem;min-height:40px}
 .saved{font-size:.78rem;color:var(--muted)}
 .chk label{display:flex;gap:.65rem;align-items:flex-start;padding:.45rem 0;border-bottom:1px dashed var(--soft)}
 input[type=checkbox]{width:18px;height:18px;accent-color:var(--good);flex:none;margin-top:.22rem}
@@ -368,6 +368,10 @@ function sbInit(){
 async function sbInitReal(){
   try{
     sb=window.supabase.createClient(SB_URL,SB_KEY);
+    sb.auth.onAuthStateChange((event,session)=>{
+      sbUser=session&&session.user;
+      if(event==='SIGNED_IN'||event==='USER_UPDATED'){sbPull();if((location.hash||'').startsWith('#/materiais'))renderMateriais();}
+    });
     let {data:{session}}=await sb.auth.getSession();
     if(!session){
       const {data,error}=await sb.auth.signInAnonymously();
@@ -435,6 +439,35 @@ async function sbPushAll(){
     if(bmRows.length)await sb.from('study_bookmarks').insert(bmRows);
   }catch(e){console.warn('Falha ao sincronizar progresso com Supabase.',e);}
   sbSyncing=false;
+}
+
+function sbAccountStatusHTML(){
+  if(!sb)return '<p class="sub">Sincronização com a nuvem indisponível neste momento — seu progresso continua salvo neste navegador.</p>';
+  if(!sbUser)return '<p class="sub">Conectando à nuvem…</p>';
+  if(sbUser.email&&!sbUser.is_anonymous)return `<p class="sub">Conectado como <strong>${esc(sbUser.email)}</strong> — seu progresso sincroniza com qualquer aparelho em que você entrar com esse e-mail.</p>`;
+  return '<p class="sub">Este aparelho está usando uma conta anônima: seu progresso está salvo na nuvem, mas só é acessível deste navegador. Vincule um e-mail para acessar de outros aparelhos, sem perder nada do que já estudou.</p>';
+}
+async function sbLinkEmail(email){
+  const box=$('#acctmsg');if(!box)return;
+  if(!sb||!sbUser){box.textContent='Sincronização indisponível agora. Tente novamente mais tarde.';return;}
+  box.textContent='Enviando…';
+  const redirect=location.origin+location.pathname;
+  try{
+    if(sbUser.is_anonymous){
+      const {error}=await sb.auth.updateUser({email},{emailRedirectTo:redirect});
+      if(error){
+        if(/already|registrad|exist|taken|in use/i.test(error.message||'')){
+          const {error:e2}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:redirect}});
+          if(e2)throw e2;
+          box.textContent='Esse e-mail já tem conta. Enviamos um link de acesso para '+email+' — abra-o neste aparelho para entrar (o progresso anônimo daqui, se ainda não sincronizado, fica preservado à parte).';
+        }else throw error;
+      }else{
+        box.textContent='Enviamos um link de confirmação para '+email+'. Abra-o para vincular este progresso ao seu e-mail.';
+      }
+    }else{
+      box.textContent='Este aparelho já está conectado a '+sbUser.email+'.';
+    }
+  }catch(e){box.textContent='Não foi possível enviar: '+(e&&e.message||'erro desconhecido');}
 }
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2200);}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -831,7 +864,7 @@ function notesMD(){
   return md;
 }
 function renderMateriais(){
-  V.innerHTML=`<h1>Backup e exportação</h1><p class="sub">Seus dados ficam só neste navegador. Exporte com frequência para não perder nada.</p>
+  V.innerHTML=`<h1>Backup e exportação</h1><p class="sub">Seus dados ficam salvos neste navegador e, se a sincronização estiver ativa, também na nuvem.</p><h2>Conta e sincronização entre aparelhos</h2>${sbAccountStatusHTML()}<p><input type="email" id="acctemail" placeholder="seu@email.com" style="max-width:280px"> <button class="btn" id="acctbtn">Vincular / Entrar</button></p><p class="sub" id="acctmsg"></p>
   <div class="tw"><table><thead><tr><th scope="col">Arquivo</th><th scope="col">Conteúdo</th><th scope="col"></th></tr></thead><tbody>
   <tr><td><strong>minhas-anotacoes.md</strong></td><td>Anotações, respostas dos exercícios e marcações, organizadas por módulo.</td><td><button class="btn" data-x="md">Baixar</button></td></tr>
   <tr><td><strong>backup-apostila.json</strong></td><td>Tudo o que você marcou e escreveu, para restaurar em outro navegador.</td><td><button class="btn" data-x="json">Baixar</button></td></tr>
@@ -846,6 +879,7 @@ function renderMateriais(){
     if(x==='py'){const c=U[0].blocks.find(b=>b.t==='code'&&b.lang==='PYTHON');dl('gerar_base.txt',c?c.text:'','text/plain');}});
   $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(typeof o!=='object'||!o.sec)throw 0;S=Object.assign(S,o);save();applyPrefs();buildMenus();toast('Backup restaurado');renderMateriais();}catch(err){toast('Arquivo inválido: escolha um backup-apostila.json');}};r.readAsText(f);};
   $('#wipe').onclick=()=>{if(confirm('Apagar todo o progresso, anotações e marcações deste navegador?')){S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},theme:S.theme,fs:S.fs,focus:false,last:null};save();buildMenus();toast('Dados apagados');}};
+  const acctBtn=$('#acctbtn');if(acctBtn)acctBtn.onclick=()=>{const email=($('#acctemail').value||'').trim();if(!email){$('#acctmsg').textContent='Digite um e-mail válido.';return;}sbLinkEmail(email);};
 }
 
 /* ---------- init ---------- */
