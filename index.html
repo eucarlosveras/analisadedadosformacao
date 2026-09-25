@@ -6,7 +6,7 @@
 <title>Do Zero ao Melhor Analista de Dados — Apostila interativa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F4F6F9;--panel:#FFFFFF;--ink:#16223A;--muted:#5D6B80;--line:#D9DFE8;--soft:#EDF1F6;--hdr:#EEF2F7;
@@ -15,9 +15,9 @@
   --ref-b:#2F6FC4;--ref-r:#C0392B;--ref-p:#7A4DB8;--ref-a:#B7791F;
   --hl-y:#FFE38A;--hl-g:#C4F0D6;--hl-b:#CFE0FF;--hl-p:#FFD0E1;
   --code-bg:#0F1D33;--code-ink:#DCE6F5;--code-line:#23385A;
-  --fs:17px;--measure:70ch;--rad:6px;--mc:var(--accent);
-  --f-body:"Source Sans 3","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
-  --f-head:"Manrope","Segoe UI",system-ui,sans-serif;
+  --fs:17px;--measure:70ch;--rad:6px;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,Arial,sans-serif;
+  --f-head:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,Arial,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,"Courier New",monospace;
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -53,9 +53,9 @@ button{cursor:pointer}
 /* ===== header: app bar + query console ===== */
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--navy);color:#E9F0FA;box-shadow:0 1px 0 rgba(0,0,0,.2)}
 .ribbon{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem}
-.brand{font-family:var(--f-head);font-weight:800;font-size:1rem;display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff;margin-right:auto;min-width:0;letter-spacing:-.01em}
+.brand{font-family:var(--f-head);font-weight:700;font-size:1rem;display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff;margin-right:auto;min-width:0;letter-spacing:-.01em}
 .brand:hover{color:#fff}
-.brand .logo{display:inline-grid;place-items:center;width:30px;height:30px;background:var(--orange);color:var(--navy);border-radius:7px;font-family:var(--f-head);font-weight:800;font-size:.82rem;flex:none}
+.brand .logo{display:inline-grid;place-items:center;width:30px;height:30px;background:var(--orange);color:var(--navy);border-radius:7px;font-family:var(--f-head);font-weight:700;font-size:.82rem;flex:none}
 .brand small{font-family:var(--f-body);font-weight:400;color:#A9BBD6;font-size:.85rem;margin-left:.2rem}
 .ribbon .btn,.ribbon .menu>summary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#E9F0FA;font-weight:600}
 .ribbon .btn:hover,.ribbon .menu>summary:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
@@ -66,19 +66,12 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;backgroun
 .menupanel{position:absolute;right:0;top:calc(100% + 8px);width:min(92vw,600px);max-height:75vh;overflow:auto;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 24px 50px rgba(8,20,40,.3);padding:.5rem}
 .menupanel details{border-bottom:1px solid var(--soft)}
 .menupanel details>summary{padding:.55rem .5rem;cursor:pointer;font-family:var(--f-head);font-weight:700;font-size:.98rem;display:flex;gap:.5rem;align-items:center}
-.menupanel details>summary .dot{width:10px;height:10px;border-radius:2px;background:var(--mc);flex:none}
+.menupanel details>summary .dot{width:10px;height:10px;border-radius:2px;background:var(--dotc,var(--muted));flex:none}
 .menupanel ol{margin:.1rem 0 .7rem;padding-left:1.6rem;font-size:.95rem}
 .menupanel li{margin:.12rem 0}
 .menupanel .parts{display:grid;grid-template-columns:1fr 1fr;gap:2px}
 .menupanel .parts a{display:block;padding:.45rem .6rem;text-decoration:none;color:var(--ink);border-radius:5px;font-size:.94rem}
 .menupanel .parts a:hover{background:var(--accent-soft)}
-.fbar{display:flex;align-items:center;gap:.6rem;padding:.4rem 1rem .45rem;background:#0A2444;border-top:1px solid rgba(255,255,255,.08);font-family:var(--f-mono);font-size:.8rem;color:#C9D6EA;min-width:0}
-.namebox{color:var(--orange);white-space:nowrap;flex:none}
-.namebox::after{content:none}
-.fxlab{color:#6F86A8;flex:none}
-.fxtext{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#E9F0FA;min-width:0;flex:1}
-.fxtext .kw{color:#7FB0F5}.fxtext .st{color:#9FE0B6}.fxtext .nu{color:#F3C47E}
-.qstat{flex:none;color:#8FE3B0;white-space:nowrap}
 .progtop{height:3px;background:rgba(255,255,255,.08)}
 .progtop>i{display:block;height:100%;background:var(--orange);width:0;transition:width .4s}
 
@@ -91,14 +84,14 @@ aside.side nav>a:hover{background:var(--soft)}
 aside.side details{border-top:1px solid var(--soft)}
 aside.side details>summary{cursor:pointer;font-family:var(--f-head);font-weight:700;font-size:.92rem;padding:.55rem 1rem;list-style:none;display:grid;grid-template-columns:10px minmax(0,1fr) 44px;gap:.6rem;align-items:center;line-height:1.3}
 aside.side details>summary::-webkit-details-marker{display:none}
-aside.side details>summary .dot{width:10px;height:10px;border-radius:2px;background:var(--mc)}
+aside.side details>summary .dot{width:10px;height:10px;border-radius:2px;background:var(--dotc,var(--muted))}
 aside.side details>summary .mini{height:4px;background:var(--soft);border-radius:2px;overflow:hidden}
-aside.side details>summary .mini>i{display:block;height:100%;background:var(--mc)}
+aside.side details>summary .mini>i{display:block;height:100%;background:var(--accent)}
 aside.side details a{display:grid;grid-template-columns:2.9rem minmax(0,1fr) 1.2rem;align-items:center;text-decoration:none;color:var(--ink);line-height:1.35;border-left:3px solid transparent}
 aside.side details a>span{padding:.3rem .35rem}
 aside.side .n{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);text-align:right;padding-right:.5rem!important}
 aside.side details a:hover{background:var(--soft)}
-aside.side a.cur{background:var(--accent-soft);font-weight:700;border-left-color:var(--mc)}
+aside.side a.cur{background:var(--accent-soft);font-weight:700;border-left-color:var(--accent)}
 aside.side .ok{color:var(--good);font-size:.8rem;padding-left:0!important}
 main{padding:1.8rem clamp(1rem,4vw,3.2rem) 5rem;min-width:0}
 .col{max-width:calc(var(--measure) + 5rem);margin:0 auto}
@@ -110,7 +103,7 @@ body.focus header.top .hide-focus{display:none}
 
 /* ===== type ===== */
 h1,h2,h3,h4{font-family:var(--f-head);line-height:1.2;font-weight:700;letter-spacing:-.015em}
-h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:800;margin:.2rem 0 .3rem;letter-spacing:-.025em}
+h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:700;margin:.2rem 0 .3rem;letter-spacing:-.025em}
 h2{font-size:1.5rem;margin:3rem 0 .9rem;display:flex;gap:.7rem;align-items:baseline}
 h3{font-size:1.16rem;margin:1.8rem 0 .45rem}
 h4{font-size:1.02rem;margin:1.1rem 0 .3rem}
@@ -121,27 +114,26 @@ p,li{max-width:var(--measure)}
 
 /* ===== signature: result card + heatmap ===== */
 .sheet{position:relative;margin:0 0 1.6rem;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(13,46,85,.05)}
-.sheet::before{content:attr(data-q);display:block;font-family:var(--f-mono);font-size:.74rem;color:var(--muted);padding:.5rem 1.2rem;border-bottom:1px solid var(--line);background:var(--hdr);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sheet>*{margin-left:1.4rem;margin-right:1.4rem}
 .sheet>.hero{margin-top:1.3rem}
 .sheet>:last-child{margin-bottom:1.3rem}
 .sheet .crumb{font-size:.86rem;color:var(--muted);margin-top:1rem;margin-bottom:.4rem}
 .sheet .crumb a{color:var(--muted)}
 .hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.3rem;align-items:center}
-.acell{position:relative;min-width:5.6rem;height:5.6rem;padding:.5rem .6rem;border-radius:10px;background:var(--mc);color:#fff;font-family:var(--f-head);font-weight:800;font-size:2.6rem;line-height:1;display:flex;flex-direction:column;justify-content:flex-end;letter-spacing:-.03em}
+.acell{position:relative;min-width:5.6rem;height:5.6rem;padding:.5rem .6rem;border-radius:10px;background:var(--accent);color:#fff;font-family:var(--f-head);font-weight:700;font-size:2.6rem;line-height:1;display:flex;flex-direction:column;justify-content:flex-end;letter-spacing:-.03em}
 .acell small{position:absolute;top:.5rem;left:.6rem;font-family:var(--f-mono);font-size:.64rem;font-weight:500;opacity:.85;letter-spacing:0}
 .acell::after{content:"";position:absolute;right:.6rem;top:.55rem;width:21px;height:15px;opacity:.85;background:linear-gradient(#fff,#fff) 0 100%/3px 45% no-repeat,linear-gradient(#fff,#fff) 6px 100%/3px 75% no-repeat,linear-gradient(#fff,#fff) 12px 100%/3px 55% no-repeat,linear-gradient(#fff,#fff) 18px 100%/3px 100% no-repeat}
 .hero h1{margin:0}
 .hero .orig{color:var(--muted);margin:.25rem 0 0;font-size:.95rem;font-family:var(--f-mono);font-size:.8rem}
 .heat{display:flex;flex-wrap:wrap;gap:4px;margin-top:1.1rem;margin-bottom:.2rem}
 .heat a{width:18px;height:18px;border-radius:4px;background:var(--soft);border:1px solid var(--line);display:block}
-.heat a.on{background:var(--mc);border-color:var(--mc)}
+.heat a.on{background:var(--accent);border-color:var(--accent)}
 .heat a:hover{outline:2px solid var(--orange);outline-offset:1px}
 .heatmap{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr) 3.4rem;gap:.35rem .9rem;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.2rem;margin:1rem 0}
 .heatmap .lbl{font-size:.88rem;display:flex;gap:.5rem;align-items:center;min-width:0}
 .heatmap .lbl a{color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .heatmap .lbl a:hover{color:var(--accent)}
-.heatmap .dot{width:10px;height:10px;border-radius:2px;background:var(--mc);flex:none}
+.heatmap .dot{width:10px;height:10px;border-radius:2px;background:var(--dotc,var(--muted));flex:none}
 .heatmap .heat{margin:0;gap:3px}
 .heatmap .heat a{width:14px;height:14px;border-radius:3px}
 .heatmap .pct{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);text-align:right}
@@ -156,11 +148,11 @@ p,li{max-width:var(--measure)}
 .rankbadge{font-family:var(--f-mono);font-size:.66rem;color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:.03rem .45rem;margin-left:.3rem;white-space:nowrap;display:inline-block}
 .tocsub{font-family:var(--f-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:.55rem 1rem .15rem;list-style:none}
 .sescard{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.6rem;min-width:0}
-.sescard.cur{border-color:var(--mc);box-shadow:0 0 0 1px var(--mc)}
+.sescard.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .seshead{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-family:var(--f-head)}
 .sesnum{font-weight:800;font-size:.95rem;white-space:nowrap}
 .sesmod{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);margin-right:auto;min-width:0}
-.sesmod .dot{width:9px;height:9px;border-radius:2px;background:var(--mc);flex:none}
+.sesmod .dot{width:9px;height:9px;border-radius:2px;background:var(--dotc,var(--muted));flex:none}
 .sesflag{font-size:.76rem;font-weight:700;border-radius:999px;padding:.1rem .55rem;white-space:nowrap}
 .sesflag.ok{background:var(--accent-soft);color:var(--good)}
 .sesflag.cur{background:var(--orange);color:#1B1206}
@@ -172,11 +164,6 @@ p,li{max-width:var(--measure)}
 @media (min-width:640px){.sestopics{display:grid;grid-template-columns:1fr 1fr;column-gap:1.2rem}}
 @media (max-width:560px){.hero{grid-template-columns:1fr;gap:.9rem}.acell{justify-self:start;font-size:2rem;min-width:4.6rem;height:4.6rem}}
 
-/* ideia/fx line */
-.fx{display:grid;grid-template-columns:auto 1fr;border:1px solid var(--code-line);border-radius:10px;background:var(--code-bg);color:var(--code-ink);margin:1rem 0 1.4rem;overflow:hidden}
-.fx .lab{font-family:var(--f-mono);font-size:.8rem;padding:.7rem .8rem;color:var(--orange);display:flex;align-items:center;border-right:1px solid var(--code-line)}
-.fx .val{padding:.6rem 1rem;font-size:1rem}
-.fx code{background:none;color:var(--code-ink);font-size:.9rem}
 
 /* ===== tables ===== */
 table{border-collapse:collapse;width:100%;font-size:.94rem}
@@ -202,11 +189,10 @@ mark.hl.y{background:var(--hl-y)}mark.hl.g{background:var(--hl-g)}mark.hl.b{back
 /* ===== KPI cards ===== */
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.8rem;margin:1rem 0}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.9rem 1.1rem;font-size:.88rem;color:var(--muted);position:relative;overflow:hidden}
-.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--mc,var(--accent))}
-.stat:nth-child(2){--mc:var(--orange)}.stat:nth-child(3){--mc:var(--teal)}.stat:nth-child(4){--mc:#7A4DB8}
-.stat b{display:block;font-family:var(--f-head);font-weight:800;font-size:2rem;line-height:1.1;color:var(--ink);margin-bottom:.15rem;letter-spacing:-.03em}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+.stat b{display:block;font-family:var(--f-head);font-weight:700;font-size:2rem;line-height:1.1;color:var(--ink);margin-bottom:.15rem;letter-spacing:-.03em}
 .bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
-.bar>i{display:block;height:100%;background:var(--mc,var(--accent));border-radius:4px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:4px}
 .modrow{display:grid;grid-template-columns:minmax(0,1fr) 150px 3.2rem;gap:.7rem;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--soft)}
 .pager{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:3.2rem}
 .pager a{border:1px solid var(--line);border-radius:10px;padding:.85rem 1.1rem;text-decoration:none;background:var(--panel);color:var(--ink);font-family:var(--f-head);font-weight:700;font-size:1rem}
@@ -232,14 +218,14 @@ mark.q{background:var(--hl-y);color:inherit}
 
 /* ===== sections as notebook cells ===== */
 h2.sec{flex-wrap:wrap;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
-.hn2{font-family:var(--f-mono);font-size:.62em;font-weight:500;color:var(--mc);flex:none;align-self:center;letter-spacing:0}
+.hn2{font-family:var(--f-mono);font-size:.62em;font-weight:500;color:var(--accent);flex:none;align-self:center;letter-spacing:0}
 .hn2::before{content:"In [";color:var(--muted)}.hn2::after{content:"]:";color:var(--muted)}
 .hn2.nb::before,.hn2.nb::after{content:""}
 .secchk{margin-left:auto;font-family:var(--f-body);font-size:.8rem;font-weight:400;color:var(--muted);display:inline-flex;gap:.4rem;align-items:center;cursor:pointer;align-self:center;border:1px solid var(--line);border-radius:999px;padding:.12rem .65rem .12rem .45rem;letter-spacing:0}
 .secchk:has(input:checked){border-color:var(--good);color:var(--good);background:color-mix(in srgb,var(--good) 10%,transparent)}
 .secchk input{width:15px;height:15px;margin:0}
 .call{border:1px solid var(--line);border-left:4px solid var(--c,var(--accent));border-radius:10px;background:var(--panel);padding:.85rem 1.15rem;margin:1.1rem 0}
-.call>.lab{display:flex;align-items:center;gap:.5rem;font-family:var(--f-head);font-weight:800;font-size:.9rem;color:var(--c,var(--accent));margin:0 0 .35rem}
+.call>.lab{display:flex;align-items:center;gap:.5rem;font-family:var(--f-head);font-weight:700;font-size:.9rem;color:var(--c,var(--accent));margin:0 0 .35rem}
 .call>.lab svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .call>:last-child{margin-bottom:0}.call p{margin:.4rem 0}
 .call.k-dica,.call.k-ia,.call.k-intro,.call.k-material{--c:var(--ref-b)}
@@ -247,8 +233,8 @@ h2.sec{flex-wrap:wrap;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
 .call.k-exemplo{--c:var(--teal)}
 .call.k-exercicios,.call.k-miniprojeto{--c:var(--orange)}
 .call.k-gabarito,.call.k-autoavaliacao{--c:var(--ref-p)}
-.call.k-objetivos{--c:var(--mc);background:color-mix(in srgb,var(--mc) 8%,var(--panel));border-color:color-mix(in srgb,var(--mc) 25%,var(--line))}
-details.call>summary{cursor:pointer;list-style:none;font-family:var(--f-head);font-weight:800;font-size:.92rem;color:var(--c);display:flex;gap:.5rem;align-items:center}
+.call.k-objetivos{--c:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--panel));border-color:color-mix(in srgb,var(--accent) 25%,var(--line))}
+details.call>summary{cursor:pointer;list-style:none;font-family:var(--f-head);font-weight:700;font-size:.92rem;color:var(--c);display:flex;gap:.5rem;align-items:center}
 details.call>summary::-webkit-details-marker{display:none}
 details.call>summary::after{content:"mostrar";margin-left:auto;font-family:var(--f-mono);font-weight:400;font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.05rem .55rem}
 details.call[open]>summary::after{content:"ocultar"}
@@ -277,21 +263,21 @@ figure.img figcaption{font-size:.74rem;color:#5D6B80;padding:.35rem .2rem 0;font
 .lightbox{position:fixed;inset:0;background:rgba(8,16,30,.86);z-index:120;display:none;align-items:center;justify-content:center;padding:2vw;cursor:zoom-out}
 .lightbox img{max-width:96vw;max-height:94vh;background:#fff;border-radius:8px}
 .flow{display:flex;flex-direction:column;align-items:center;margin:1.2rem 0}
-.flow .node{width:min(100%,460px);border:1px solid color-mix(in srgb,var(--mc) 40%,var(--line));background:color-mix(in srgb,var(--mc) 7%,var(--panel));border-radius:10px;padding:.65rem 1rem;text-align:center}
+.flow .node{width:min(100%,460px);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:color-mix(in srgb,var(--accent) 7%,var(--panel));border-radius:10px;padding:.65rem 1rem;text-align:center}
 .flow .node b{display:block;font-family:var(--f-head);font-size:1.02rem}
 .flow .node span{color:var(--muted);font-size:.92rem}
 .flow .arr{width:2px;height:22px;background:var(--muted);position:relative}
 .flow .arr::after{content:"";position:absolute;left:-4px;bottom:-2px;border:5px solid transparent;border-top-color:var(--muted)}
 .toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.4rem;margin:0 0 1.4rem;font-size:.9rem}
 .toc a{display:grid;grid-template-columns:3.1rem minmax(0,1fr) 1.2rem;align-items:center;background:var(--panel);text-decoration:none;color:var(--ink);min-height:40px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.toc a:hover{border-color:var(--mc)}
+.toc a:hover{border-color:var(--accent)}
 .toc a>span{padding:.3rem .5rem;line-height:1.3}
 .toc a .n{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);align-self:stretch;display:flex;align-items:center;justify-content:center;background:var(--hdr)}
-.toc a.ok .n{background:var(--mc);color:#fff}
+.toc a.ok .n{background:var(--accent);color:#fff}
 .toc a .ck{color:var(--good);padding:0}
 ul ul,ol ul{margin:.25rem 0}
 li{margin:.22rem 0}
-li::marker{color:var(--mc)}
+li::marker{color:var(--accent)}
 td code,th code{white-space:nowrap}
 .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.6rem}
 .legend .call{margin:0}
@@ -305,7 +291,6 @@ td code,th code{white-space:nowrap}
   .ribbon .ico,.ribbon a.btn{width:40px;padding:0;justify-content:center;min-height:40px}
   .ribbon .menu>summary{height:34px;min-height:34px;padding:0 .55rem;font-size:.85rem}
   #sidebtn{min-height:34px;padding:0 .55rem;font-size:.85rem}
-  .qstat{display:none}
   .sheet>*{margin-left:1rem;margin-right:1rem}
   h2{font-size:1.3rem}
 }
@@ -326,7 +311,6 @@ td code,th code{white-space:nowrap}
     <button class="btn ico" id="focusbtn" aria-pressed="false" title="Modo foco" aria-label="Modo foco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
     <button class="btn ico" id="themebtn" aria-pressed="false" title="Modo noturno" aria-label="Modo noturno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
   </div>
-  <div class="fbar" aria-hidden="true"><span class="namebox" id="namebox">apostila</span><span class="fxlab">❯</span><span class="fxtext" id="fxtext"></span><span class="qstat" id="qstat"></span></div>
   <div class="progtop" aria-hidden="true"><i id="progtop"></i></div>
 </header>
 <div class="wrap">
@@ -570,11 +554,11 @@ $('#sidebtn').onclick=()=>{const o=document.body.classList.toggle('sideopen');$(
 const PARTS=[['#/inicio','Início'],['#/guia','Como usar esta apostila'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
 function buildMenus(){
   let h='<div class="parts">'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</div><hr style="border:0;border-top:1px solid var(--line)">';
-  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--mc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
+  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--dotc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
   $('#menupanel').innerHTML=h;
   $('#menupanel').addEventListener('click',e=>{if(e.target.closest('a'))$('#modmenu').removeAttribute('open');});
   let s='<nav aria-label="Geral"><h2>Geral</h2>'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</nav><nav aria-label="Trilha"><h2>Trilha de estudo</h2>';
-  s+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details data-u="${u.id}" style="--mc:${u.color}"><summary><span class="dot"></span><span>${u.kind==='mod'?'M'+u.num+' · ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}</span><span class="mini" title="${secDone(u)}/${u.secs.length} seções"><i style="width:${u.secs.length?secDone(u)/u.secs.length*100:0}%"></i></span></summary>`+groupByTier(u.secs).map(g=>`<div class="tocsub">${TIER_LABEL[g.tier]}</div>`+g.items.map(x=>`<a href="#/u/${u.id}/${x.id}" data-s="${x.id}"><span class="n">${esc(x.n||'•')}</span><span>${esc(x.t)}</span><span class="ok">${S.sec[x.id]?'✔':''}</span></a>`).join('')).join('')+'</details>').join('')+'</nav>';
+  s+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details data-u="${u.id}" style="--dotc:${u.color}"><summary><span class="dot"></span><span>${u.kind==='mod'?'M'+u.num+' · ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}</span><span class="mini" title="${secDone(u)}/${u.secs.length} seções"><i style="width:${u.secs.length?secDone(u)/u.secs.length*100:0}%"></i></span></summary>`+groupByTier(u.secs).map(g=>`<div class="tocsub">${TIER_LABEL[g.tier]}</div>`+g.items.map(x=>`<a href="#/u/${u.id}/${x.id}" data-s="${x.id}"><span class="n">${esc(x.n||'•')}</span><span>${esc(x.t)}</span><span class="ok">${S.sec[x.id]?'✔':''}</span></a>`).join('')).join('')+'</details>').join('')+'</nav>';
   $('#side').innerHTML=s;
 }
 document.addEventListener('click',e=>{const m=$('#modmenu');if(m.open&&!m.contains(e.target))m.removeAttribute('open');});
@@ -654,16 +638,9 @@ function route(){
   window.scrollTo(0,0);$('#main').focus({preventScroll:true});
 }
 const kw=w=>`<span class="kw">${w}</span>`,st=w=>`<span class="st">'${esc(w)}'</span>`,nu=w=>`<span class="nu">${w}</span>`;
-const Q={inicio:['trilha',`${kw('SELECT')} modulo, progresso ${kw('FROM')} apostila.trilha ${kw('ORDER BY')} id;`],guia:['guia',`${kw('SELECT')} * ${kw('FROM')} apostila.guia_de_uso;`],painel:['painel',`${kw('SELECT')} unidade, ${kw('AVG')}(estudada) ${kw('FROM')} progresso ${kw('GROUP BY')} unidade;`],busca:['busca',`${kw('SELECT')} * ${kw('FROM')} apostila.conteudo ${kw('WHERE')} texto ${kw('LIKE')} ${st('%…%')};`],materiais:['backup',`${kw('COPY')} meus_dados ${kw('TO')} ${st('backup-apostila.json')};`]};
+const Q={inicio:'trilha',guia:'guia',painel:'painel',busca:'busca',materiais:'backup'};
 function decorate(p){
-  const u=p[0]==='u'&&byId[p[1]];
-  if(u){const sec=p[2]&&u.secs.find(s=>s.id===p[2]);
-    $('#namebox').textContent='apostila.'+u.id;
-    $('#fxtext').innerHTML=sec?`${kw('SELECT')} * ${kw('FROM')} secoes ${kw('WHERE')} id = ${st(sec.n||sec.t)};`:`${kw('SELECT')} * ${kw('FROM')} secoes ${kw('WHERE')} ${u.kind==='mod'?'modulo = '+nu(u.num):'unidade = '+st(u.title)};`;
-    $('#qstat').textContent=sec?(S.sec[sec.id]?'✓ 1 linha · estudada':'✓ 1 linha'):`✓ ${u.secs.length} linhas · ${secDone(u)} estudadas`;}
-  else{const q=Q[p[0]]||Q.inicio;$('#namebox').textContent='apostila.'+q[0];$('#fxtext').innerHTML=q[1];
-    const all=allSecs();$('#qstat').textContent=`✓ ${all.filter(s=>S.sec[s.id]).length}/${all.length} seções`;}
-  if(!V.querySelector('.sheet')){const h=V.querySelector('h1');if(h){const code=(Q[p[0]]||Q.inicio)[0];const sh=document.createElement('div');sh.className='sheet';sh.dataset.q='-- apostila.'+code;
+  if(!V.querySelector('.sheet')){const h=V.querySelector('h1');if(h){const code=Q[p[0]]||Q.inicio;const sh=document.createElement('div');sh.className='sheet';
     const val={guia:'?',painel:'%',busca:'⌕',backup:'↓'}[code]||'•';
     sh.innerHTML=`<div class="hero"><div class="acell" aria-hidden="true"><small>${code}</small>${val}</div><div class="ht"></div></div>`;
     h.parentNode.insertBefore(sh,h);const ht=sh.querySelector('.ht');ht.appendChild(h);
@@ -705,20 +682,19 @@ function renderCurrentSession(){
   let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
   if(streak>=SESSIONS.length)return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Você concluiu as ${SESSIONS.length} sessões da trilha completa. 🎉</p></div>`;
   const s=SESSIONS[streak],i=streak,prog=sessionProgress(s);
-  const card=`<div class="sescard cur" style="--mc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" style="--mc:${s.mod.color}" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
+  const card=`<div class="sescard cur" style="--dotc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
   return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como estudadas, a próxima sobe automaticamente para cá.</p><details class="cronohelp"><summary>Por que a ordem pula entre módulos?</summary><p>As sessões intercalam os 15 módulos de propósito, alternando de assunto a cada sessão para não ficar repetitivo (em vez de esgotar um módulo inteiro antes de seguir para o próximo). Dentro de cada módulo, o conteúdo segue quatro níveis, sempre nesta ordem: <strong>Fundamentos → Aplicação → Avançado → Prática e avaliação</strong>. Os selos “Xª na trilha” ao lado de cada módulo (na barra lateral e no mapa de calor) mostram essa ordem recomendada de estudo — diferente da numeração M1–M15, que é só um índice de referência.</p></details>${card}</div>`;
 }
 function renderHome(){
   const all=allSecs(),d=all.filter(s=>S.sec[s.id]).length,md=MODS.filter(m=>S.done[m.id]).length;
   const nextU=S.last&&byId[S.last];
-  V.innerHTML=`${renderCurrentSession()}<div class="sheet homehero" data-q="-- ${U.length} unidades · ${all.length} seções · ${d} estudadas" style="--mc:var(--navy)"><div class="hero"><div class="acell" aria-hidden="true" style="background:var(--navy)"><small>módulos</small>15</div><div>
+  V.innerHTML=`${renderCurrentSession()}<div class="sheet homehero" data-q="-- ${U.length} unidades · ${all.length} seções · ${d} estudadas"><div class="hero"><div class="acell" aria-hidden="true" style="background:var(--navy)"><small>módulos</small>15</div><div>
   <h1>Do Zero ao Melhor Analista de Dados</h1>
   <p class="lede">Formação completa em 15 módulos: fundamentos, Excel, estatística, SQL, BI, Python, qualidade de dados, ferramentas, soft skills, carreira, IA e tópicos avançados — com exemplos testados, exercícios com gabarito e mini-projetos.</p>
   <div class="acts">${nextU?`<a class="btn primary" href="#/u/${nextU.id}">Continuar: ${esc(nextU.short)}</a><a class="btn" href="#/painel">Ver meu progresso</a>`:`<a class="btn primary" href="#/u/apresentacao">Começar pela apresentação</a><a class="btn" href="#/guia">Como usar esta apostila</a>`}</div></div></div></div>
-  <div class="fx" role="note"><span class="lab">In [1]:</span><span class="val"><code>analista = técnica + negócio + comunicação + ia</code></span></div>
   <div class="grid"><div class="stat"><b>${d}<span style="font-size:.5em;color:var(--muted)">/${all.length}</span></b>seções estudadas</div><div class="stat"><b>${md}<span style="font-size:.5em;color:var(--muted)">/15</span></b>módulos concluídos</div><div class="stat"><b>4</b>projetos de portfólio</div><div class="stat"><b>${Object.keys(S.ans).filter(k=>S.ans[k]).length}</b>respostas e anotações</div></div><p class="sub" style="margin-top:.5rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>
   <h2>Mapa de calor do estudo</h2><p class="sub">Cada quadrado é uma seção. Ele se preenche com a cor do módulo quando você marca a seção como estudada. Clique para ir direto a ela.</p>
-  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--mc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${u.kind==='mod'&&MOD_RANK[u.id]?`<span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div style="--mc:${u.color}">${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>`;
+  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--dotc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${u.kind==='mod'&&MOD_RANK[u.id]?`<span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div>${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>`;
 }
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
@@ -742,7 +718,7 @@ function renderUnit(uid){
   const u=byId[uid];S.last=uid;save();CK=0;CALLN=0;
   const i=U.indexOf(u),prev=U[i-1],next=U[i+1],dd=S.done[uid];
   const k=secDone(u),n=u.secs.length;
-  V.innerHTML=`<article id="art" data-u="${uid}" style="--mc:${u.color}">
+  V.innerHTML=`<article id="art" data-u="${uid}">
   <div class="sheet" data-q="-- apostila.${uid} · ${n} seções · ${k} estudadas"><p class="crumb"><a href="#/inicio">Início</a> › ${u.kind==='mod'?'Módulo '+u.num:'Material complementar'}</p>
   <div class="hero"><div class="acell" aria-hidden="true"><small>${u.kind==='mod'?'módulo':u.id.slice(0,8)}</small>${u.kind==='mod'?String(u.num).padStart(2,'0'):esc(u.code)}</div><div><h1>${esc(u.title)}</h1><p class="orig" id="ucount">${k}/${n} seções</p></div></div>
   ${n>1?heatHTML(u).replace('<div class="heat','<div id="uheat" class="heat'):''}
@@ -813,7 +789,7 @@ function renderPainel(){
   const secById={};U.forEach(u=>u.secs.forEach(s=>secById[s.id]=[u,s]));
   V.innerHTML=`<h1>Meu progresso</h1><p class="sub">Calculado a partir das seções que você marcou como estudadas.</p>
   <div class="grid"><div class="stat"><b>${Math.round(all.length?d/all.length*100:0)}%</b>da apostila estudada</div><div class="stat"><b>${MODS.filter(m=>S.done[m.id]).length}/12</b>módulos concluídos</div><div class="stat"><b>${clK}/${clN}</b>itens do checklist final</div><div class="stat"><b>${Object.values(S.hl).reduce((a,l)=>a+l.length,0)}</b>marcações feitas</div></div>
-  <h2>Por unidade</h2>${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="modrow" style="--mc:${u.color}"><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div><span class="saved">${k}/${n}</span></div>`;}).join('')}
+  <h2>Por unidade</h2>${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="modrow"><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div><span class="saved">${k}/${n}</span></div>`;}).join('')}
   <h2>Estudadas recentemente</h2>${recent.length?'<ul>'+recent.map(([k,v])=>{const x=secById[k];return x?`<li><a href="#/u/${x[0].id}/${k}">${esc((x[1].n?x[1].n+' ':'')+x[1].t)}</a> <span class="saved">${fmtD(v)}</span></li>`:'';}).join('')+'</ul>':'<p class="sub">Nenhuma seção marcada ainda. Marque “estudada” no título de cada seção ao terminá-la.</p>'}
   <h2>Favoritos</h2>${Object.keys(S.bm).filter(k=>S.bm[k]&&byId[k]).map(k=>`<a class="btn" href="#/u/${k}" style="margin:.2rem">★ ${esc(byId[k].short+(byId[k].kind==='mod'?': '+byId[k].title:''))}</a>`).join('')||'<p class="sub">Use “Favoritar” no topo de um módulo para criar atalhos aqui.</p>'}`;
 }
