@@ -83,7 +83,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;backgroun
 /* ===== layout (sem barra lateral) ===== */
 .wrap{max-width:1180px;margin:0 auto}
 main{padding:1.8rem clamp(1rem,4vw,3.2rem) 5rem;min-width:0}
-.col{max-width:calc(var(--measure) + 5rem);margin:0 auto}
+.col{max-width:1180px;margin:0 auto}
 body.focus .lp-side{display:none}
 body.focus header.top .hide-focus{display:none}
 @media (min-width:901px){.only-mobile{display:none!important}}
@@ -147,6 +147,22 @@ p,li{max-width:var(--measure)}
 .lchk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center}
 .lnum{font-family:var(--f-mono);font-size:.7rem;color:var(--faint);width:2.4rem;flex:none}
 .ltitle{flex:1;font-size:.92rem}
+/* ===== cronograma de estudos (sessão atual) ===== */
+.cronotop{margin:0 0 1.8rem}
+.sescard{border:1px solid var(--line);border-radius:var(--rad);background:var(--panel);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.6rem;margin-top:.9rem}
+.sescard.cur{border-color:var(--accent-line);background:var(--accent-dim)}
+.seshead{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-family:var(--f-head)}
+.sesnum{font-weight:700;font-size:.95rem;white-space:nowrap}
+.sesmod{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);margin-right:auto;min-width:0}
+.sesmod .dot{width:9px;height:9px;border-radius:50%;background:var(--dotc,var(--muted));flex:none}
+.sesflag{font-family:var(--f-mono);font-size:.72rem;font-weight:600;border-radius:999px;padding:.25rem .6rem;white-space:nowrap}
+.sesflag.cur{background:var(--accent);color:var(--accent-ink)}
+.sescorr{font-size:.85rem;color:var(--muted);font-style:italic;margin:0}
+.sestopics{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.25rem}
+.sestopics a{display:flex;gap:.4rem;text-decoration:none;color:var(--ink);font-size:.9rem;padding:.25rem 0}
+.sestopics a:hover{color:var(--accent)}
+.sestopics .ok{color:var(--good)}
+@media (min-width:640px){.sestopics{display:grid;grid-template-columns:1fr 1fr;column-gap:1.2rem}}
 .lesson.done .ltitle{color:var(--muted)}
 
 /* ===== pagina de aula ===== */
@@ -303,8 +319,8 @@ td code,th code{white-space:nowrap}
 <a class="skip" href="#main">Pular para o conteúdo</a>
 <header class="top" role="banner">
   <div class="ribbon">
-<a class="brand" href="#/inicio"><span class="logo" aria-hidden="true">AD</span><span class="bt">Do Zero ao Melhor Analista de Dados<small>curso online · v2.0</small></span></a>
-<details class="menu" id="modmenu"><summary aria-label="Abrir índice de cursos">Cursos ▾</summary><div class="menupanel" id="menupanel"></div></details>
+<a class="brand" href="#/inicio"><span class="logo" aria-hidden="true">AD</span><span class="bt">Do Zero ao Melhor Analista de Dados<small>trilha de estudos · v2.0</small></span></a>
+<details class="menu" id="modmenu"><summary aria-label="Abrir índice de módulos">Módulos ▾</summary><div class="menupanel" id="menupanel"></div></details>
     <a class="btn hide-focus" href="#/busca" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="lbl">Buscar</span></a>
     <a class="btn hide-focus" href="#/painel" aria-label="Meu progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Progresso</span></a>
     <button class="btn ico" id="fontbtn" title="Tamanho da fonte" aria-label="Tamanho da fonte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.5 5h1L15 19M5 14h7M17 10h5M19.5 7.5v5"/></svg></button>
@@ -487,6 +503,67 @@ function groupByTier(secs){
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
+const MOD_WHY={
+  m1:'Primeiro módulo da trilha — entender o papel do analista e a linguagem básica de dados e negócio.',
+  m2:'Depois dos fundamentos, o primeiro ferramental: Excel é onde a maioria dos analistas começa a manipular dados de verdade.',
+  m4:'Com o Excel dominado, SQL amplia a mesma lógica de tabelas para bases de dados reais e volumes maiores.',
+  m6:'Python fecha o tripé de ferramentas (Excel, SQL, Python) antes de entrar em teoria estatística mais pesada.',
+  m3:'Com as ferramentas em mãos, agora a base teórica: estatística sustenta qualquer análise ou modelo daqui em diante.',
+  m7:'Ferramentas e estatística prontas — hora de aprender a garantir que os dados que você analisa são confiáveis.',
+  m13:'Aprofunda o SQL e o Power Query dos módulos anteriores num cenário real de banco de dados e pipelines de ETL.',
+  m5:'Com dados limpos e modelados, o próximo passo natural é comunicá-los: visualização e BI.',
+  m15:'Depois de aprender a criar dashboards, o passo seguinte é publicá-los e mantê-los em produção.',
+  m8:'Fecha o ferramental técnico com ferramentas complementares do dia a dia do analista.',
+  m11:'Com estatística, Python e dados limpos dominados, é hora de usar IA e machine learning como analista.',
+  m12:'Tópicos avançados que aprofundam tudo o que veio antes — a trilha de maestria técnica.',
+  m14:'Depois da profundidade técnica, o contexto de negócio: como finanças e métricas de empresa se conectam ao seu trabalho.',
+  m9:'Com a base técnica e de negócio completa, hora das habilidades que decidem quem cresce na carreira: comunicação, ética, liderança.',
+  m10:'Módulo final: transformar tudo o que foi estudado em portfólio e em uma candidatura de verdade.'
+};
+const SESSION_MAX=6;
+const SESSIONS=(()=>{
+  const perMod=MOD_ORDER.map(mid=>{
+    const m=byId[mid];if(!m)return null;
+    const secsT=m.secs.map(s=>Object.assign({},s,{tier:sectionTier(s.t)}));
+    let end=secsT.length;
+    while(end>0&&secsT[end-1].tier===4)end--;
+    const body=secsT.slice(0,end),tail=secsT.slice(end);
+    const chunks=[];let chunk=[];
+    body.forEach(s=>{
+      if(s.tier===1&&chunk.length){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+      chunk.push(s);
+      if(chunk.length>=SESSION_MAX){chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});chunk=[];}
+    });
+    if(chunk.length)chunks.push({secs:chunk,tier:Math.max.apply(null,chunk.map(x=>x.tier))});
+    if(tail.length)chunks.push({secs:tail,tier:4});
+    return {mod:m,chunks};
+  }).filter(Boolean);
+  const out=[];
+  const maxRounds=Math.max.apply(null,perMod.map(p=>p.chunks.length));
+  for(let round=0;round<maxRounds;round++){
+    perMod.forEach(p=>{
+      if(round<p.chunks.length){const c=p.chunks[round];out.push({secs:c.secs,mod:p.mod,tier:c.tier});}
+    });
+  }
+  const byMod={};out.forEach(s=>{byMod[s.mod.id]=(byMod[s.mod.id]||0)+1;});
+  const seen={};out.forEach((s,idx)=>{s.n=idx+1;seen[s.mod.id]=(seen[s.mod.id]||0)+1;s.part=seen[s.mod.id];s.parts=byMod[s.mod.id];});
+  return out;
+})();
+const sessionDone=s=>s.secs.every(x=>S.sec[x.id]);
+const sessionProgress=s=>s.secs.filter(x=>S.sec[x.id]).length;
+function sessionCorrelation(s,i){
+  if(s.part===1)return MOD_WHY[s.mod.id]||`Primeira sessão do ${esc(s.mod.short)}.`;
+  if(s.tier===4)return `Fecha o conteúdo do ${esc(s.mod.short)} por enquanto — hora de praticar e se autoavaliar nele.`;
+  return `Retomando o ${esc(s.mod.short)} (parte ${s.part} de ${s.parts}) — intercalado com os outros assuntos para não ficar repetitivo.`;
+}
+function renderCurrentSession(){
+  if(!SESSIONS.length)return '';
+  let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
+  if(streak>=SESSIONS.length)return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Você concluiu as ${SESSIONS.length} sessões da trilha completa. 🎉</p></div>`;
+  const s=SESSIONS[streak],i=streak,prog=sessionProgress(s);
+  const card=`<div class="sescard cur" style="--dotc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
+  return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como concluídas, a próxima sobe automaticamente para cá.</p>${card}</div>`;
+}
 function countCallsBefore(blocks,targetIdx){
   let n=0;
   const rec=b=>{let c=b.t==='call'?1:0;if(b.t==='call')c+=b.blocks.reduce((a,x)=>a+rec(x),0);return c;};
@@ -513,10 +590,10 @@ $('#fontbtn').onclick=()=>{S.fs=S.fs>=19?16:S.fs+1;applyPrefs();save();toast('Fo
 $('#focusbtn').onclick=()=>{S.focus=!S.focus;applyPrefs();save();toast(S.focus?'Modo foco ativado':'Modo foco desativado');};
 
 /* ---------- menus ---------- */
-const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona o curso'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
+const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona a trilha'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
 function buildMenus(){
   let h='<div class="parts">'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</div><hr style="border:0;border-top:1px solid var(--line)">';
-  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--dotc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Curso '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
+  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--dotc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
   $('#menupanel').innerHTML=h;
   $('#menupanel').addEventListener('click',e=>{if(e.target.closest('a'))$('#modmenu').removeAttribute('open');});
 }
@@ -653,8 +730,8 @@ function renderHome(){
     const node=isDone?'✓':isCur?'●':String(i+1);
     return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${m.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${esc(m.title)}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
   }).join('');
-  const lede=curIdx<0?`Você concluiu os 15 cursos da trilha — ${totalAulas} aulas ao todo. 🎉`:`Analista de Dados · 15 cursos · ${totalAulas} aulas no total · ${doneAulas} de ${totalAulas} aulas concluídas.`;
-  V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${doneCursos}/15</div><div>
+  const lede=curIdx<0?`Você concluiu os 15 módulos da trilha — ${totalAulas} aulas ao todo. 🎉`:`Analista de Dados · 15 módulos · ${totalAulas} aulas no total · ${doneAulas} de ${totalAulas} aulas concluídas.`;
+  V.innerHTML=`${renderCurrentSession()}<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${doneCursos}/15</div><div>
   <h1>Sua trilha</h1>
   <p class="lede">${lede}</p>
   </div></div></div>
@@ -664,8 +741,8 @@ function renderHome(){
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
   const desc={objetivos:'O que você vai conseguir fazer ao terminar o módulo.',dica:'Regras, atalhos e boas práticas.',atencao:'Cuidados e erros comuns.',exemplo:'Aplicação na base de estudo.',ia:'Como usar IA no tema e onde ela erra.',exercicios:'Exercícios com campo para suas respostas.',gabarito:'Fica recolhido: abra só depois de tentar.',miniprojeto:'Entrega para o portfólio, com campo de acompanhamento.',autoavaliacao:'Perguntas para checar se você pode avançar — marque as que já domina.'};
-  V.innerHTML=`<h1>Como funciona o curso</h1><p class="sub">Tudo o que você marca e escreve fica salvo neste navegador.</p>
-  <h2>Roteiro sugerido</h2><ol class="steps"><li><span>Leia a <a href="#/u/apresentacao">Apresentação</a> e conheça os sete pilares do analista.</span></li><li><span>Na <strong>Trilha</strong> (tela inicial), veja os 15 cursos em ordem — o curso atual vem destacado, com um botão para continuar direto na próxima aula.</span></li><li><span>Dentro de um curso, escolha uma aula na lista (agrupada em Fundamentos, Aplicação, Avançado e Prática e avaliação) e marque <strong>concluída</strong> no título dela ao terminar. Use os botões de anterior/próxima para seguir para a aula seguinte sem voltar à lista.</span></li><li><span>Faça os exercícios no próprio campo de resposta, depois abra o gabarito para conferir.</span></li><li><span>Entregue o mini-projeto, responda à autoavaliação e marque o curso como concluído quando terminar todas as aulas.</span></li><li><span>Acompanhe tudo no <a href="#/painel">painel de progresso</a> e faça backup em <a href="#/materiais">Backup e exportação</a> de vez em quando — o progresso é salvo só neste navegador.</span></li></ol>
+  V.innerHTML=`<h1>Como funciona a trilha</h1><p class="sub">Tudo o que você marca e escreve fica salvo neste navegador.</p>
+  <h2>Roteiro sugerido</h2><ol class="steps"><li><span>Leia a <a href="#/u/apresentacao">Apresentação</a> e conheça os sete pilares do analista.</span></li><li><span>Na <strong>Trilha</strong> (tela inicial), veja os 15 módulos em ordem — o módulo atual vem destacado, com um botão para continuar direto na próxima aula.</span></li><li><span>Dentro de um módulo, escolha uma aula na lista (agrupada em Fundamentos, Aplicação, Avançado e Prática e avaliação) e marque <strong>concluída</strong> no título dela ao terminar. Use os botões de anterior/próxima para seguir para a aula seguinte sem voltar à lista.</span></li><li><span>Faça os exercícios no próprio campo de resposta, depois abra o gabarito para conferir.</span></li><li><span>Entregue o mini-projeto, responda à autoavaliação e marque o módulo como concluído quando terminar todas as aulas.</span></li><li><span>Acompanhe tudo no <a href="#/painel">painel de progresso</a> e faça backup em <a href="#/materiais">Backup e exportação</a> de vez em quando — o progresso é salvo só neste navegador.</span></li></ol>
   <h2>Legenda dos quadros</h2><div class="legend">${kinds.map(k=>`<div class="call k-${k}"><p class="lab">${svg(k)}${LAB[k]}</p><p>${desc[k]}</p></div>`).join('')}</div>
   <h2>Recursos de estudo</h2>
   <div class="tw"><table><thead><tr><th scope="col">Recurso</th><th scope="col">Como usar</th></tr></thead><tbody>
@@ -693,7 +770,7 @@ function renderCourse(uid){
   const r=31,circ=2*Math.PI*r,off=circ*(1-(n?k/n:0));
   const groups=groupByTier(u.secs);
   const blurb=courseBlurb(u);
-  const crumbLabel=u.kind==='mod'?`Curso ${MOD_RANK[uid]||u.num} de 15`:'Material complementar';
+  const crumbLabel=u.kind==='mod'?`Módulo ${MOD_RANK[uid]||u.num} de 15`:'Material complementar';
   V.innerHTML=`<div class="sheet">
   <p class="crumb"><a href="#/inicio">Trilha</a> › ${esc(crumbLabel)}</p>
   <div class="course-head">
@@ -701,12 +778,12 @@ function renderCourse(uid){
     ${n>1?`<div class="ring"><svg width="70" height="70"><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg><div class="ring-txt"><b>${k}/${n}</b><span>AULAS</span></div></div>`:''}
   </div>
   ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}</div></a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
-  <div class="meta" style="margin-top:1.4rem">${u.kind==='mod'||uid==='projetos'?`<button class="btn ${dd?'':'primary'}" id="donebtn" aria-pressed="${!!dd}">${dd?'✔ Concluído em '+fmtD(dd):'Marcar curso como concluído'}</button>`:''}<button class="btn" id="bmbtn" aria-pressed="${!!S.bm[uid]}">${S.bm[uid]?'★ Nos favoritos':'☆ Favoritar'}</button></div>
+  <div class="meta" style="margin-top:1.4rem">${u.kind==='mod'||uid==='projetos'?`<button class="btn ${dd?'':'primary'}" id="donebtn" aria-pressed="${!!dd}">${dd?'✔ Concluído em '+fmtD(dd):'Marcar módulo como concluído'}</button>`:''}<button class="btn" id="bmbtn" aria-pressed="${!!S.bm[uid]}">${S.bm[uid]?'★ Nos favoritos':'☆ Favoritar'}</button></div>
   <h2 id="notas"><span class="hn2 nb">✎</span><span>Minhas anotações</span></h2>
   ${ta(uid+'-notas','Resumo com suas palavras, dúvidas, links úteis…',8)}
   </div>`;
   bindCommon(V,uid);
-  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Curso concluído. Bom trabalho!');}save();renderCourse(uid);};
+  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Módulo concluído. Bom trabalho!');}save();renderCourse(uid);};
   const bb=$('#bmbtn');if(bb)bb.onclick=()=>{S.bm[uid]=!S.bm[uid];save();bb.textContent=S.bm[uid]?'★ Nos favoritos':'☆ Favoritar';bb.setAttribute('aria-pressed',!!S.bm[uid]);};
 }
 function lessonBlocks(u,sid){
@@ -729,7 +806,7 @@ function renderLesson(uid,sid){
   else{
     const ord=MOD_ORDER.map(id=>byId[id]).filter(Boolean);
     const ci=ord.indexOf(u);
-    if(ci>=0&&ord[ci+1]&&ord[ci+1].secs[0]){const nc=ord[ci+1];nextHref=`#/u/${nc.id}/${nc.secs[0].id}`;nextLabel='Próximo curso: '+esc(nc.title);}
+    if(ci>=0&&ord[ci+1]&&ord[ci+1].secs[0]){const nc=ord[ci+1];nextHref=`#/u/${nc.id}/${nc.secs[0].id}`;nextLabel='Próximo módulo: '+esc(nc.title);}
   }
   const tier=sectionTier(sec.t);
   const k=secDone(u),n=u.secs.length;
@@ -743,7 +820,7 @@ function renderLesson(uid,sid){
       <nav class="lp-nav">${prevSec?`<a class="navbtn" href="#/u/${uid}/${prevSec.id}">← ${esc((prevSec.n?prevSec.n+' ':'')+prevSec.t)}</a>`:'<span></span>'}${nextHref?`<a class="navbtn next" href="${nextHref}">${nextLabel} →</a>`:''}</nav>
     </div>
     <aside class="lp-side">
-      <div class="side-block"><b>Progresso do curso</b><div class="bar" title="${k}/${n} aulas concluídas"><i style="width:${n?k/n*100:0}%"></i></div></div>
+      <div class="side-block"><b>Progresso do módulo</b><div class="bar" title="${k}/${n} aulas concluídas"><i style="width:${n?k/n*100:0}%"></i></div></div>
       <div class="side-block"><b>${esc(TIER_LABEL[tier]||'')}</b><div class="mini-list">${curGroup.items.map(it=>`<a class="mini-item${it.id===sid?' active':''}${S.sec[it.id]?' done':''}" href="#/u/${uid}/${it.id}"><span class="mini-dot"></span>${esc((it.n?it.n+' ':'')+it.t)}</a>`).join('')}</div></div>
     </aside>
   </div>`;
@@ -801,10 +878,10 @@ function renderPainel(){
   const recent=Object.entries(S.sec).filter(([k,v])=>v>1).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const secById={};U.forEach(u=>u.secs.forEach(s=>secById[s.id]=[u,s]));
   V.innerHTML=`<h1>Meu progresso</h1><p class="sub">Calculado a partir das aulas que você marcou como concluídas.</p>
-  <div class="grid"><div class="stat"><b>${Math.round(all.length?d/all.length*100:0)}%</b>do curso concluído</div><div class="stat"><b>${MODS.filter(m=>S.done[m.id]).length}/15</b>cursos concluídos</div><div class="stat"><b>${clK}/${clN}</b>itens do checklist final</div><div class="stat"><b>${Object.values(S.hl).reduce((a,l)=>a+l.length,0)}</b>marcações feitas</div></div>
-  <h2>Por curso</h2>${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="modrow"><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div><span class="saved">${k}/${n}</span></div>`;}).join('')}
+  <div class="grid"><div class="stat"><b>${Math.round(all.length?d/all.length*100:0)}%</b>da trilha concluída</div><div class="stat"><b>${MODS.filter(m=>S.done[m.id]).length}/15</b>módulos concluídos</div><div class="stat"><b>${clK}/${clN}</b>itens do checklist final</div><div class="stat"><b>${Object.values(S.hl).reduce((a,l)=>a+l.length,0)}</b>marcações feitas</div></div>
+  <h2>Por módulo</h2>${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="modrow"><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div><span class="saved">${k}/${n}</span></div>`;}).join('')}
   <h2>Concluídas recentemente</h2>${recent.length?'<ul>'+recent.map(([k,v])=>{const x=secById[k];return x?`<li><a href="#/u/${x[0].id}/${k}">${esc((x[1].n?x[1].n+' ':'')+x[1].t)}</a> <span class="saved">${fmtD(v)}</span></li>`:'';}).join('')+'</ul>':'<p class="sub">Nenhuma aula marcada ainda. Marque “concluída” no título de cada aula ao terminá-la.</p>'}
-  <h2>Favoritos</h2>${Object.keys(S.bm).filter(k=>S.bm[k]&&byId[k]).map(k=>`<a class="btn" href="#/u/${k}" style="margin:.2rem">★ ${esc(byId[k].short+(byId[k].kind==='mod'?': '+byId[k].title:''))}</a>`).join('')||'<p class="sub">Use “Favoritar” no topo de um curso para criar atalhos aqui.</p>'}`;
+  <h2>Favoritos</h2>${Object.keys(S.bm).filter(k=>S.bm[k]&&byId[k]).map(k=>`<a class="btn" href="#/u/${k}" style="margin:.2rem">★ ${esc(byId[k].short+(byId[k].kind==='mod'?': '+byId[k].title:''))}</a>`).join('')||'<p class="sub">Use “Favoritar” no topo de um módulo para criar atalhos aqui.</p>'}`;
 }
 
 /* ---------- busca ---------- */
@@ -819,7 +896,7 @@ function buildIdx(){IDX=[];U.forEach(u=>{let sec=null;const walk=(bs,ctx)=>bs.fo
 const fold=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function renderBusca(q0){
   if(!IDX)buildIdx();
-  V.innerHTML=`<h1>Buscar no curso</h1><p class="sub">Procura em textos, tabelas, códigos e exercícios.</p>
+  V.innerHTML=`<h1>Buscar na trilha</h1><p class="sub">Procura em textos, tabelas, códigos e exercícios.</p>
   <div class="filters"><label class="sr" for="q">Termo</label><input type="search" id="q" placeholder="Ex.: window functions, DAX, LGPD" value="${esc(q0)}" style="flex:1;min-width:220px">
   <select id="fu" aria-label="Unidade"><option value="">Todas as unidades</option>${U.map(u=>`<option value="${u.id}">${esc(u.kind==='mod'?u.code+' '+u.title:u.title)}</option>`).join('')}</select>
   <select id="fk" aria-label="Tipo"><option value="">Todos os tipos</option><option>Título</option><option>Texto</option><option>Tabela</option><option>Código</option><option>Exercício</option></select></div><div id="res"></div>`;
@@ -855,7 +932,7 @@ function notesMD(){
 function renderMateriais(){
   V.innerHTML=`<h1>Backup e exportação</h1><p class="sub">Seus dados ficam salvos neste navegador e, se a sincronização estiver ativa, também na nuvem.</p><h2>Conta e sincronização entre aparelhos</h2>${sbAccountStatusHTML()}<p><input type="email" id="acctemail" placeholder="seu@email.com" style="max-width:280px"> <button class="btn" id="acctbtn">Vincular / Entrar</button></p><p class="sub" id="acctmsg"></p>
   <div class="tw"><table><thead><tr><th scope="col">Arquivo</th><th scope="col">Conteúdo</th><th scope="col"></th></tr></thead><tbody>
-  <tr><td><strong>minhas-anotacoes.md</strong></td><td>Anotações, respostas dos exercícios e marcações, organizadas por curso.</td><td><button class="btn" data-x="md">Baixar</button></td></tr>
+  <tr><td><strong>minhas-anotacoes.md</strong></td><td>Anotações, respostas dos exercícios e marcações, organizadas por módulo.</td><td><button class="btn" data-x="md">Baixar</button></td></tr>
   <tr><td><strong>backup-apostila.json</strong></td><td>Tudo o que você marcou e escreveu, para restaurar em outro navegador.</td><td><button class="btn" data-x="json">Baixar</button></td></tr>
   <tr><td><strong>gerar_base.txt</strong></td><td>O script da base de estudo. Renomeie para <code>gerar_base.py</code> e rode no Colab ou no Anaconda.</td><td><button class="btn" data-x="py">Baixar</button></td></tr>
   </tbody></table></div>
