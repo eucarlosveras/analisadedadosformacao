@@ -148,6 +148,24 @@ p,li{max-width:var(--measure)}
 .heatmap .cap{grid-column:1/-1;font-size:.8rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap;margin-top:.4rem;padding-top:.6rem;border-top:1px dashed var(--line)}
 .heatmap .cap i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:.3rem;background:var(--soft);border:1px solid var(--line)}
 @media (max-width:640px){.heatmap{grid-template-columns:1fr 3rem}.heatmap .heat{grid-column:1/-1;margin-bottom:.5rem}.heatmap .lbl{grid-row:auto}}
+/* ===== grade curricular de estudos (sessões) ===== */
+.sesgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.9rem;margin:1rem 0 2rem}
+.sescard{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.sescard.cur{border-color:var(--mc);box-shadow:0 0 0 1px var(--mc)}
+.sescard.done{opacity:.72}
+.seshead{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-family:var(--f-head)}
+.sesnum{font-weight:800;font-size:.95rem;white-space:nowrap}
+.sesmod{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);margin-right:auto;min-width:0}
+.sesmod .dot{width:9px;height:9px;border-radius:2px;background:var(--mc);flex:none}
+.sesflag{font-size:.76rem;font-weight:700;border-radius:999px;padding:.1rem .55rem;white-space:nowrap}
+.sesflag.ok{background:var(--accent-soft);color:var(--good)}
+.sesflag.cur{background:var(--orange);color:#1B1206}
+.sescorr{font-size:.83rem;color:var(--muted);font-style:italic;margin:0}
+.sestopics{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.15rem}
+.sestopics a{display:flex;gap:.4rem;text-decoration:none;color:var(--ink);font-size:.86rem;padding:.15rem 0}
+.sestopics a:hover{color:var(--accent)}
+.sestopics .ok{color:var(--good)}
+@media (max-width:560px){.sesgrid{grid-template-columns:1fr}}
 @media (max-width:560px){.hero{grid-template-columns:1fr;gap:.9rem}.acell{justify-self:start;font-size:2rem;min-width:4.6rem;height:4.6rem}}
 
 /* ideia/fx line */
@@ -354,6 +372,10 @@ const byId={};U.forEach(u=>byId[u.id]=u);
 const MODS=U.filter(u=>u.kind==='mod');
 const allSecs=()=>U.flatMap(u=>u.secs);
 const secDone=u=>u.secs.filter(s=>S.sec[s.id]).length;
+const SESSION_SIZE=5;
+const SESSIONS=(()=>{const out=[];let n=0;MODS.forEach(m=>{const chunks=[];for(let i=0;i<m.secs.length;i+=SESSION_SIZE)chunks.push(m.secs.slice(i,i+SESSION_SIZE));chunks.forEach((secs,idx)=>{n++;out.push({n,mod:m,part:idx+1,parts:chunks.length,secs});});});return out;})();
+const sessionDone=s=>s.secs.every(x=>S.sec[x.id]);
+const sessionProgress=s=>s.secs.filter(x=>S.sec[x.id]).length;
 
 /* ---------- prefs ---------- */
 function applyPrefs(){
@@ -497,6 +519,21 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
   }
 
 /* ---------- pages ---------- */
+function sessionCorrelation(s,i){
+  if(i===0)return 'Primeira sessão da trilha — o ponto de partida de tudo.';
+  const prev=SESSIONS[i-1];
+  if(prev.mod.id!==s.mod.id)return `Abre o ${esc(s.mod.short)} — recomendado depois de concluir o ${esc(prev.mod.short)}.`;
+  return `Continua direto da Sessão ${prev.n}, dentro do ${esc(s.mod.short)}.`;
+}
+function renderSessionsGrid(){
+  let streak=0;for(const s of SESSIONS){if(sessionDone(s))streak++;else break;}
+  const visible=Math.min(SESSIONS.length,Math.max(10,streak+1));
+  const cards=SESSIONS.slice(0,visible).map((s,i)=>{
+    const done=sessionDone(s),prog=sessionProgress(s),cur=!done&&i===streak;
+    return `<div class="sescard${done?' done':''}${cur?' cur':''}" style="--mc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · parte ${s.part}/${s.parts}</span>${done?'<span class="sesflag ok">✔ concluída</span>':cur?'<span class="sesflag cur">→ estude agora</span>':''}</div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" style="--mc:${s.mod.color}" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
+  }).join('');
+  return `<h2>Grade curricular de estudos</h2><p class="sub">A trilha completa tem ${SESSIONS.length} sessões, dos assuntos mais introdutórios (Módulo 1) aos mais avançados (Módulo 15). Sem prazo por sessão — o ritmo é o seu: assim que todas as seções de uma sessão forem marcadas como estudadas, a próxima sessão é liberada automaticamente logo abaixo.</p><div class="sesgrid">${cards}</div>`;
+}
 function renderHome(){
   const all=allSecs(),d=all.filter(s=>S.sec[s.id]).length,md=MODS.filter(m=>S.done[m.id]).length;
   const nextU=S.last&&byId[S.last];
@@ -507,7 +544,7 @@ function renderHome(){
   <div class="fx" role="note"><span class="lab">In [1]:</span><span class="val"><code>analista = técnica + negócio + comunicação + ia</code></span></div>
   <div class="grid"><div class="stat"><b>${d}<span style="font-size:.5em;color:var(--muted)">/${all.length}</span></b>seções estudadas</div><div class="stat"><b>${md}<span style="font-size:.5em;color:var(--muted)">/15</span></b>módulos concluídos</div><div class="stat"><b>4</b>projetos de portfólio</div><div class="stat"><b>${Object.keys(S.ans).filter(k=>S.ans[k]).length}</b>respostas e anotações</div></div>
   <h2>Mapa de calor do estudo</h2><p class="sub">Cada quadrado é uma seção. Ele se preenche com a cor do módulo quando você marca a seção como estudada. Clique para ir direto a ela.</p>
-  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--mc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div style="--mc:${u.color}">${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>`;
+  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--mc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div style="--mc:${u.color}">${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>${renderSessionsGrid()}`;
 }
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
