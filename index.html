@@ -48,7 +48,7 @@ button{cursor:pointer}
 .btn.primary:hover{background:#F0A551;color:#1B1206}
 .btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
 .btn svg,.ico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.ico{width:38px;padding:0;justify-content:center}
+.ico{width:44px;min-height:44px;padding:0;justify-content:center}
 
 /* ===== header: app bar + query console ===== */
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--navy);color:#E9F0FA;box-shadow:0 1px 0 rgba(0,0,0,.2)}
@@ -150,6 +150,11 @@ p,li{max-width:var(--measure)}
 @media (max-width:640px){.heatmap{grid-template-columns:1fr 3rem}.heatmap .heat{grid-column:1/-1;margin-bottom:.5rem}.heatmap .lbl{grid-row:auto}}
 /* ===== cronograma de estudos (sessão atual) ===== */
 .cronotop{margin:0 0 1.6rem}
+.cronohelp{margin:.6rem 0 0;font-size:.85rem;color:var(--muted)}
+.cronohelp summary{cursor:pointer;color:var(--accent);font-weight:600}
+.cronohelp p{margin:.5rem 0 0}
+.rankbadge{font-family:var(--f-mono);font-size:.66rem;color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:.03rem .45rem;margin-left:.3rem;white-space:nowrap;display:inline-block}
+.tocsub{font-family:var(--f-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:.55rem 1rem .15rem;list-style:none}
 .sescard{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.6rem;min-width:0}
 .sescard.cur{border-color:var(--mc);box-shadow:0 0 0 1px var(--mc)}
 .seshead{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;font-family:var(--f-head)}
@@ -297,7 +302,7 @@ td code,th code{white-space:nowrap}
   .ribbon{padding:.45rem .6rem;gap:.25rem;flex-wrap:nowrap}
   .brand small,.brand .bt{display:none}
   .ribbon .lbl{display:none}
-  .ribbon .ico,.ribbon a.btn{width:34px;padding:0;justify-content:center;min-height:34px}
+  .ribbon .ico,.ribbon a.btn{width:40px;padding:0;justify-content:center;min-height:40px}
   .ribbon .menu>summary{height:34px;min-height:34px;padding:0 .55rem;font-size:.85rem}
   #sidebtn{min-height:34px;padding:0 .55rem;font-size:.85rem}
   .qstat{display:none}
@@ -365,7 +370,7 @@ U.forEach(u=>{
   const walk=bs=>bs.forEach(b=>{if(b.t==='h2'){b.sid=u.id+'-s'+(++k);u.secs.push({id:b.sid,n:b.n||'',t:strip(b.h)});}if(b.t==='call')walk(b.blocks);});
   walk(u.blocks);
 });
-const MC={m1:'#234E82',m2:'#1F8A5B',m3:'#7A4DB8',m4:'#0E7C86',m5:'#D98A1F',m6:'#3673C4',m7:'#B5563A',m8:'#5A6B7F',m9:'#C2477A',m10:'#4F8A2E',m11:'#D0621F',m12:'#0D2E55',m13:'#6B4FA0',m14:'#0E7C86',m15:'#B5563A',apresentacao:'#E8963A',projetos:'#01544D',glossario:'#5A6B7F',referencias:'#5A6B7F',checklist:'#1F8A5B'};
+const MC={m1:'#234E82',m2:'#1F8A5B',m3:'#7A4DB8',m4:'#0E7C86',m5:'#D98A1F',m6:'#3673C4',m7:'#B5563A',m8:'#5A6B7F',m9:'#C2477A',m10:'#4F8A2E',m11:'#D0621F',m12:'#0D2E55',m13:'#6B4FA0',m14:'#A8342E',m15:'#1FA8A8',apresentacao:'#E8963A',projetos:'#01544D',glossario:'#5A6B7F',referencias:'#5A6B7F',checklist:'#1F8A5B'};
 U.forEach(u=>u.color=MC[u.id]||'#234E82');
 const byId={};U.forEach(u=>byId[u.id]=u);
 const MODS=U.filter(u=>u.kind==='mod');
@@ -378,7 +383,13 @@ function sectionTier(t){
   if(/^o que [ée]|introdu[çc][ãa]o|fundamentos|primeiros passos|apresenta[çc][ãa]o|objetivo|panorama|^por que/.test(s))return 1;
   return 2;
 }
+function groupByTier(secs){
+  const out=[];let cur=null;
+  secs.forEach(s=>{const t=sectionTier(s.t);if(!cur||cur.tier!==t){cur={tier:t,items:[]};out.push(cur);}cur.items.push(s);});
+  return out;
+}
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
+const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const MOD_WHY={
   m1:'Primeiro módulo da trilha — entender o papel do analista e a linguagem básica de dados e negócio.',
   m2:'Depois dos fundamentos, o primeiro ferramental: Excel é onde a maioria dos analistas começa a manipular dados de verdade.',
@@ -446,11 +457,11 @@ $('#sidebtn').onclick=()=>{const o=document.body.classList.toggle('sideopen');$(
 const PARTS=[['#/inicio','Início'],['#/guia','Como usar esta apostila'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
 function buildMenus(){
   let h='<div class="parts">'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</div><hr style="border:0;border-top:1px solid var(--line)">';
-  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--mc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}</summary><ol style="list-style:none;padding-left:.6rem">`+u.secs.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')+'</ol></details>').join('');
+  h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--mc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
   $('#menupanel').innerHTML=h;
   $('#menupanel').addEventListener('click',e=>{if(e.target.closest('a'))$('#modmenu').removeAttribute('open');});
   let s='<nav aria-label="Geral"><h2>Geral</h2>'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</nav><nav aria-label="Trilha"><h2>Trilha de estudo</h2>';
-  s+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details data-u="${u.id}" style="--mc:${u.color}"><summary><span class="dot"></span><span>${u.kind==='mod'?'M'+u.num+' · ':''}${esc(u.title)}</span><span class="mini" title="${secDone(u)}/${u.secs.length} seções"><i style="width:${u.secs.length?secDone(u)/u.secs.length*100:0}%"></i></span></summary>`+u.secs.map(x=>`<a href="#/u/${u.id}/${x.id}" data-s="${x.id}"><span class="n">${esc(x.n||'•')}</span><span>${esc(x.t)}</span><span class="ok">${S.sec[x.id]?'✔':''}</span></a>`).join('')+'</details>').join('')+'</nav>';
+  s+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details data-u="${u.id}" style="--mc:${u.color}"><summary><span class="dot"></span><span>${u.kind==='mod'?'M'+u.num+' · ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}</span><span class="mini" title="${secDone(u)}/${u.secs.length} seções"><i style="width:${u.secs.length?secDone(u)/u.secs.length*100:0}%"></i></span></summary>`+groupByTier(u.secs).map(g=>`<div class="tocsub">${TIER_LABEL[g.tier]}</div>`+g.items.map(x=>`<a href="#/u/${u.id}/${x.id}" data-s="${x.id}"><span class="n">${esc(x.n||'•')}</span><span>${esc(x.t)}</span><span class="ok">${S.sec[x.id]?'✔':''}</span></a>`).join('')).join('')+'</details>').join('')+'</nav>';
   $('#side').innerHTML=s;
 }
 document.addEventListener('click',e=>{const m=$('#modmenu');if(m.open&&!m.contains(e.target))m.removeAttribute('open');});
@@ -582,7 +593,7 @@ function renderCurrentSession(){
   if(streak>=SESSIONS.length)return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Você concluiu as ${SESSIONS.length} sessões da trilha completa. 🎉</p></div>`;
   const s=SESSIONS[streak],i=streak,prog=sessionProgress(s);
   const card=`<div class="sescard cur" style="--mc:${s.mod.color}"><div class="seshead"><span class="sesnum">Sessão ${s.n} de ${SESSIONS.length}</span><span class="sesmod"><span class="dot"></span>${esc(s.mod.short)} · ${TIER_LABEL[s.tier]} · parte ${s.part}/${s.parts}</span><span class="sesflag cur">→ estude agora</span></div><p class="sescorr">${sessionCorrelation(s,i)}</p><ol class="sestopics">${s.secs.map(x=>`<li><a href="#/u/${s.mod.id}/${x.id}">${x.n?`<span class="mono">${esc(x.n)}</span> `:''}${esc(x.t)}${S.sec[x.id]?' <span class="ok">✔</span>':''}</a></li>`).join('')}</ol><div class="bar" style="--mc:${s.mod.color}" title="${prog}/${s.secs.length} seções estudadas"><i style="width:${s.secs.length?prog/s.secs.length*100:0}%"></i></div></div>`;
-  return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como estudadas, a próxima sobe automaticamente para cá.</p>${card}</div>`;
+  return `<div class="cronotop"><h2 style="margin-top:0">Cronograma de estudos</h2><p class="sub">Sem prazo por sessão — o ritmo é o seu. Assim que todas as seções desta sessão forem marcadas como estudadas, a próxima sobe automaticamente para cá.</p><details class="cronohelp"><summary>Por que a ordem pula entre módulos?</summary><p>As sessões intercalam os 15 módulos de propósito, alternando de assunto a cada sessão para não ficar repetitivo (em vez de esgotar um módulo inteiro antes de seguir para o próximo). Dentro de cada módulo, o conteúdo segue quatro níveis, sempre nesta ordem: <strong>Fundamentos → Aplicação → Avançado → Prática e avaliação</strong>. Os selos “Xª na trilha” ao lado de cada módulo (na barra lateral e no mapa de calor) mostram essa ordem recomendada de estudo — diferente da numeração M1–M15, que é só um índice de referência.</p></details>${card}</div>`;
 }
 function renderHome(){
   const all=allSecs(),d=all.filter(s=>S.sec[s.id]).length,md=MODS.filter(m=>S.done[m.id]).length;
@@ -592,15 +603,15 @@ function renderHome(){
   <p class="lede">Formação completa em 15 módulos: fundamentos, Excel, estatística, SQL, BI, Python, qualidade de dados, ferramentas, soft skills, carreira, IA e tópicos avançados — com exemplos testados, exercícios com gabarito e mini-projetos.</p>
   <div class="acts">${nextU?`<a class="btn primary" href="#/u/${nextU.id}">Continuar: ${esc(nextU.short)}</a><a class="btn" href="#/painel">Ver meu progresso</a>`:`<a class="btn primary" href="#/u/apresentacao">Começar pela apresentação</a><a class="btn" href="#/guia">Como usar esta apostila</a>`}</div></div></div></div>
   <div class="fx" role="note"><span class="lab">In [1]:</span><span class="val"><code>analista = técnica + negócio + comunicação + ia</code></span></div>
-  <div class="grid"><div class="stat"><b>${d}<span style="font-size:.5em;color:var(--muted)">/${all.length}</span></b>seções estudadas</div><div class="stat"><b>${md}<span style="font-size:.5em;color:var(--muted)">/15</span></b>módulos concluídos</div><div class="stat"><b>4</b>projetos de portfólio</div><div class="stat"><b>${Object.keys(S.ans).filter(k=>S.ans[k]).length}</b>respostas e anotações</div></div>
+  <div class="grid"><div class="stat"><b>${d}<span style="font-size:.5em;color:var(--muted)">/${all.length}</span></b>seções estudadas</div><div class="stat"><b>${md}<span style="font-size:.5em;color:var(--muted)">/15</span></b>módulos concluídos</div><div class="stat"><b>4</b>projetos de portfólio</div><div class="stat"><b>${Object.keys(S.ans).filter(k=>S.ans[k]).length}</b>respostas e anotações</div></div><p class="sub" style="margin-top:.5rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>
   <h2>Mapa de calor do estudo</h2><p class="sub">Cada quadrado é uma seção. Ele se preenche com a cor do módulo quando você marca a seção como estudada. Clique para ir direto a ela.</p>
-  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--mc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div style="--mc:${u.color}">${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>`;
+  <div class="heatmap">${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="lbl" style="--mc:${u.color}"><span class="dot"></span><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a>${u.kind==='mod'&&MOD_RANK[u.id]?`<span class="rankbadge">${MOD_RANK[u.id]}ª</span>`:''}${S.done[u.id]?' <span style="color:var(--good)">✔</span>':''}</div><div style="--mc:${u.color}">${heatHTML(u)}</div><span class="pct">${n?Math.round(k/n*100)+'%':'—'}</span>`;}).join('')}<div class="cap"><span><i></i>não estudada</span><span><i style="background:var(--accent);border-color:var(--accent)"></i>estudada (cor do módulo)</span></div></div>`;
 }
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
   const desc={objetivos:'O que você vai conseguir fazer ao terminar o módulo.',dica:'Regras, atalhos e boas práticas.',atencao:'Cuidados e erros comuns.',exemplo:'Aplicação na base de estudo.',ia:'Como usar IA no tema e onde ela erra.',exercicios:'Exercícios com campo para suas respostas.',gabarito:'Fica recolhido: abra só depois de tentar.',miniprojeto:'Entrega para o portfólio, com campo de acompanhamento.',autoavaliacao:'Perguntas para checar se você pode avançar — marque as que já domina.'};
   V.innerHTML=`<h1>Como usar esta apostila</h1><p class="sub">Tudo o que você marca e escreve fica salvo neste navegador.</p>
-  <h2>Roteiro sugerido</h2><ol class="steps"><li><span>Leia a <a href="#/u/apresentacao">Apresentação</a>, escolha um cronograma (intensivo ou parcial) e crie a base de estudo com o script <code>gerar_base.py</code>.</span></li><li><span>Estude um módulo por vez com a ferramenta aberta. Ao terminar cada seção, marque <strong>estudada</strong> no título dela.</span></li><li><span>Faça os exercícios no próprio campo de resposta, depois abra o gabarito para conferir.</span></li><li><span>Entregue o mini-projeto, responda à autoavaliação e marque o módulo como concluído.</span></li><li><span>Acompanhe tudo no <a href="#/painel">painel de progresso</a> e faça backup em <a href="#/materiais">Backup e exportação</a>.</span></li></ol>
+  <h2>Roteiro sugerido</h2><ol class="steps"><li><span>Leia a <a href="#/u/apresentacao">Apresentação</a> e conheça os sete pilares do analista.</span></li><li><span>Na tela inicial, siga o card <strong>Cronograma de estudos</strong>: ele sempre mostra a próxima sessão a estudar, uma de cada vez, sem prazo. As sessões intercalam os módulos de propósito — você não estuda um módulo inteiro antes de seguir para o próximo, e sim vai alternando de assunto a cada sessão, o que ajuda a fixar mais e evita cansar de um tema só.</span></li><li><span>Dentro de cada sessão, abra cada seção listada e marque <strong>estudada</strong> no título dela. Assim que todas as seções da sessão forem marcadas, a próxima sobe automaticamente no Cronograma — não precisa navegar manualmente.</span></li><li><span>Faça os exercícios no próprio campo de resposta, depois abra o gabarito para conferir.</span></li><li><span>Entregue o mini-projeto, responda à autoavaliação e marque o módulo como concluído quando finalizar todas as suas sessões.</span></li><li><span>Acompanhe tudo no <a href="#/painel">painel de progresso</a> e faça backup em <a href="#/materiais">Backup e exportação</a> de vez em quando — o progresso é salvo só neste navegador.</span></li></ol><p class="sub">A numeração dos módulos (M1, M2…) é só um índice de referência para localização. A ordem real recomendada de estudo é a do Cronograma, indicada pelos selos <span class="rankbadge">Xª na trilha</span> ao lado de cada módulo na barra lateral e no mapa de calor.</p>
   <h2>Legenda dos quadros</h2><div class="legend">${kinds.map(k=>`<div class="call k-${k}"><p class="lab">${svg(k)}${LAB[k]}</p><p>${desc[k]}</p></div>`).join('')}</div>
   <h2>Recursos de estudo</h2>
   <div class="tw"><table><thead><tr><th scope="col">Recurso</th><th scope="col">Como usar</th></tr></thead><tbody>
