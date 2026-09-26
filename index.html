@@ -738,6 +738,8 @@ function initBgConst(){
 function renderHome(){
   let streak=0;for(const l of LESSONS){if(blockDone(l))streak++;else break;}
   const total=LESSONS.length;
+  const totalSecs=MOD_ORDER.reduce((a,mid)=>a+(byId[mid]?byId[mid].secs.length:0),0);
+  const doneSecs=MOD_ORDER.reduce((a,mid)=>a+(byId[mid]?byId[mid].secs.filter(s=>S.sec[s.id]).length:0),0);
   let stopsHTML='',lede;
   if(streak>=total){
     lede='Analista de Dados';
@@ -760,7 +762,7 @@ function renderHome(){
     }).join('');
     lede='Analista de Dados';
   }
-  V.innerHTML=`<canvas id="bgConst" aria-hidden="true"></canvas><div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
+  V.innerHTML=`<canvas id="bgConst" aria-hidden="true"></canvas><div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${doneSecs}/${totalSecs}</div><div>
   <h1>Caminho dos <span class="accent">Dados</span></h1>
   <p class="lede">${lede}</p>
   </div></div></div>
