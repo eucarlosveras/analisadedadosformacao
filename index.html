@@ -111,6 +111,9 @@ p,li{max-width:var(--measure)}
 .homehero h1{font-size:clamp(1.6rem,3vw,2.1rem);max-width:17ch;line-height:1.03}
 .homehero .lede{font-size:1.1rem;max-width:56ch;margin:.8rem 0 1.2rem;color:var(--muted)}
 .homehero .acts{display:flex;gap:.6rem;flex-wrap:wrap}
+#bgConst{position:fixed;inset:0;pointer-events:none;opacity:.55;display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #bgConst{display:block}}
+:root[data-theme="dark"] #bgConst{display:block}
 
 /* ===== trilha (home) — linha do tipo "metrô" ===== */
 .metro{position:relative;padding-left:34px;margin:1.6rem 0}
@@ -658,6 +661,52 @@ function typeset(root){const m=$$('.math',root);if(!m.length)return;
   }
 
 /* ---------- pages ---------- */
+let bgConstRAF=0;
+function initBgConst(){
+  const cv=$('#bgConst');if(!cv)return;
+  cancelAnimationFrame(bgConstRAF);
+  const ctx=cv.getContext('2d');
+  let W,H;
+  const resize=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;};
+  resize();
+  const onResize=()=>resize();
+  addEventListener('resize',onResize);
+  const N=34,pts=[];
+  for(let i=0;i<N;i++){
+    const angle=Math.random()*Math.PI*2,speed=0.05+Math.random()*0.09;
+    pts.push({x:Math.random()*W,y:Math.random()*H,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:1.4+Math.random()*1.5,ph:Math.random()*Math.PI*2});
+  }
+  const separate=(strength,minD)=>{
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[j].x-pts[i].x,dy=pts[j].y-pts[i].y,d=Math.sqrt(dx*dx+dy*dy)||0.001;
+      if(d<minD){const f=(minD-d)/minD*strength,ux=dx/d,uy=dy/d;pts[i].x-=ux*f;pts[i].y-=uy*f;pts[j].x+=ux*f;pts[j].y+=uy*f;}
+    }
+  };
+  for(let k=0;k<40;k++)separate(2.2,110);
+  const CONNECT=150,REPEL=95;let t=0;
+  function tick(){
+    if(!document.body.contains(cv)){removeEventListener('resize',onResize);return;}
+    t+=0.016;ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[j].x-pts[i].x,dy=pts[j].y-pts[i].y,d=Math.sqrt(dx*dx+dy*dy)||0.001;
+      if(d<REPEL){const f=(1-d/REPEL)*0.02,ux=dx/d,uy=dy/d;pts[i].vx-=ux*f;pts[i].vy-=uy*f;pts[j].vx+=ux*f;pts[j].vy+=uy*f;}
+    }
+    pts.forEach(p=>{
+      p.vx+=(Math.random()-.5)*0.004;p.vy+=(Math.random()-.5)*0.004;
+      const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy),maxSp=0.16,minSp=0.035;
+      if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}else if(sp<minSp&&sp>0){p.vx=p.vx/sp*minSp;p.vy=p.vy/sp*minSp;}
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-10)p.x=W+10;if(p.x>W+10)p.x=-10;if(p.y<-10)p.y=H+10;if(p.y>H+10)p.y=-10;
+    });
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<CONNECT){const op=Math.pow(1-d/CONNECT,1.7)*0.5;ctx.strokeStyle=`rgba(63,208,255,${op.toFixed(3)})`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}
+    }
+    pts.forEach(p=>{const glow=0.5+Math.sin(t*0.8+p.ph)*0.3;ctx.fillStyle=`rgba(63,208,255,${glow.toFixed(3)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();});
+    bgConstRAF=requestAnimationFrame(tick);
+  }
+  tick();
+}
 function renderHome(){
   let streak=0;for(const l of LESSONS){if(S.sec[l.sec.id])streak++;else break;}
   const total=LESSONS.length;
@@ -681,12 +730,13 @@ function renderHome(){
     }).join('');
     lede='Analista de Dados';
   }
-  V.innerHTML=`<div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
+  V.innerHTML=`<canvas id="bgConst" aria-hidden="true"></canvas><div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
   <h1>Cronograma de estudos</h1>
   <p class="lede">${lede}</p>
   </div></div></div>
   <div class="metro">${stopsHTML}</div>
   <p class="sub" style="margin-top:1.4rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>`;
+  initBgConst();
 }
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
