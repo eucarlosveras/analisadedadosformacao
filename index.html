@@ -515,17 +515,22 @@ const LESSONS=(()=>{
   const maxLen=Math.max.apply(null,perMod.map(p=>p.secs.length));
   for(let round=0;round<maxLen;round+=CHUNK_SIZE){
     perMod.forEach(p=>{
-      const chunk=p.secs.slice(round,round+CHUNK_SIZE);
-      if(!chunk.length)return;
-      chunk.forEach(sec=>out.push({kind:'sec',sec,mod:p.mod,tier:sectionTier(sec.t)}));
-      if(round+CHUNK_SIZE<p.secs.length){
-        out.push({kind:'check',mod:p.mod,lessons:chunk,idx:round/CHUNK_SIZE+1});
-      }
+      const lessons=p.secs.slice(round,round+CHUNK_SIZE);
+      if(!lessons.length)return;
+      const hasCheck=round+CHUNK_SIZE<p.secs.length;
+      out.push({mod:p.mod,lessons,idx:round/CHUNK_SIZE+1,hasCheck});
     });
   }
   out.forEach((x,i)=>x.n=i+1);
   return out;
 })();
+function blockId(l){return l.mod.id+'-chk'+l.idx;}
+function blockDone(l){return l.lessons.every(s=>S.sec[s.id])&&(!l.hasCheck||S.sec[blockId(l)]);}
+function blockHref(l){
+  for(const s of l.lessons)if(!S.sec[s.id])return `#/u/${l.mod.id}/${s.id}`;
+  if(l.hasCheck&&!S.sec[blockId(l)])return `#/check/${l.mod.id}/${l.idx}`;
+  return `#/u/${l.mod.id}/${l.lessons[0].id}`;
+}
 function countCallsBefore(blocks,targetIdx){
   let n=0;
   const rec=b=>{let c=b.t==='call'?1:0;if(b.t==='call')c+=b.blocks.reduce((a,x)=>a+rec(x),0);return c;};
@@ -731,8 +736,7 @@ function initBgConst(){
   tick();
 }
 function renderHome(){
-  const lid=l=>l.kind==='check'?l.mod.id+'-chk'+l.idx:l.sec.id;
-  let streak=0;for(const l of LESSONS){if(S.sec[lid(l)])streak++;else break;}
+  let streak=0;for(const l of LESSONS){if(blockDone(l))streak++;else break;}
   const total=LESSONS.length;
   let stopsHTML='',lede;
   if(streak>=total){
@@ -740,26 +744,18 @@ function renderHome(){
   }else{
     const visible=LESSONS.slice(streak,streak+10);
     stopsHTML=visible.map((l,i)=>{
-      const id=lid(l);
-      const isDone=!!S.sec[id],isCur=i===0;
+      const isDone=blockDone(l),isCur=i===0;
       const state=isDone?'done':isCur?'cur':'';
-      let name,meta,href,node;
-      if(l.kind==='check'){
-        name='Aplique o que você viu';
-        meta=`${l.lessons.length} aulas · ${esc(l.mod.short)} · Prática`;
-        href=`#/check/${l.mod.id}/${l.idx}`;
-        node=isDone?'✓':isCur?'●':'✎';
-      }else{
-        name=esc(l.sec.t);
-        meta=`${l.sec.n?`<span class="mono">${esc(l.sec.n)}</span> · `:''}${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
-        href=`#/u/${l.mod.id}/${l.sec.id}`;
-        node=isDone?'✓':isCur?'●':String(i+1);
-      }
+      const first=l.lessons[0];
+      const name=esc(first.t);
+      const meta=`Bloco ${l.idx} · ${esc(l.mod.short)} · ${l.lessons.length} aula${l.lessons.length>1?'s':''}${l.hasCheck?' + prática':''}`;
+      const href=isCur?blockHref(l):`#/u/${l.mod.id}/${first.id}`;
       let right;
       if(isDone)right='<span class="pill">concluído</span>';
-      else if(isCur)right=`<a class="go" href="${href}">${l.kind==='check'?'Praticar':'Continuar'} →</a>`;
+      else if(isCur)right=`<a class="go" href="${href}">Continuar →</a>`;
       else if(i===1)right='<span class="pill">a seguir</span>';
       else right='<span class="pill">bloqueado</span>';
+      const node=isDone?'✓':isCur?'●':String(i+1);
       return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="${href}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
     }).join('');
     lede='Analista de Dados';
@@ -774,11 +770,11 @@ function renderHome(){
 }
 function renderCheck(uid,idx){
   const u=byId[uid];
-  const start=(idx-1)*CHUNK_SIZE;
-  const lessons=u?u.secs.slice(start,start+CHUNK_SIZE):[];
-  if(!u||!lessons.length){renderHome();return;}
+  const block=LESSONS.find(l=>l.mod.id===uid&&l.idx===idx);
+  if(!u||!block){renderHome();return;}
+  const lessons=block.lessons;
   S.last=uid;save();
-  const checkId=uid+'-chk'+idx;
+  const checkId=blockId(block);
   const done=!!S.sec[checkId];
   const names=lessons.map(s=>(s.n?s.n+' ':'')+s.t);
   const a=names[0],b=names[names.length-1],c=names[Math.min(1,names.length-1)];
@@ -791,11 +787,14 @@ function renderCheck(uid,idx){
     {key:checkId+'-q3',ph:'Seja honesto(a): o que ainda não está sólido?',
      h:'Destas aulas, qual você tem menos confiança de aplicar sozinho(a)? O que faria essa semana para testar isso na prática?'},
   ];
-  const li=LESSONS.findIndex(l=>l.kind==='check'&&l.mod.id===uid&&l.idx===idx);
-  const prevL=li>0?LESSONS[li-1]:null;
-  const nextL=(li>=0&&li<LESSONS.length-1)?LESSONS[li+1]:null;
-  const hrefOf=l=>l.kind==='check'?`#/check/${l.mod.id}/${l.idx}`:`#/u/${l.mod.id}/${l.sec.id}`;
-  const labelOf=l=>l.kind==='check'?'Prática':esc((l.sec.n?l.sec.n+' ':'')+l.sec.t);
+  const bi=LESSONS.indexOf(block);
+  const lastLesson=lessons[lessons.length-1];
+  const prevHref=`#/u/${uid}/${lastLesson.id}`;
+  const prevLabel=esc((lastLesson.n?lastLesson.n+' ':'')+lastLesson.t);
+  const nextBlock=(bi>=0&&bi<LESSONS.length-1)?LESSONS[bi+1]:null;
+  const nextFirst=nextBlock?nextBlock.lessons[0]:null;
+  const nextHref=nextFirst?`#/u/${nextBlock.mod.id}/${nextFirst.id}`:null;
+  const nextLabel=nextFirst?esc((nextFirst.n?nextFirst.n+' ':'')+nextFirst.t):null;
   V.innerHTML=`<div class="lesson-page">
     <div class="lp-main" id="art">
       <p class="crumb"><a href="#/inicio">Trilha</a> › <a href="#/u/${uid}">${esc(u.kind==='mod'?u.short:u.title)}</a> › Prática</p>
@@ -806,7 +805,7 @@ function renderCheck(uid,idx){
       <div class="call k-exercicios"><p class="lab">${svg('exercicios')}Teste de conhecimento — aplicação na vida real</p>
         ${qs.map(q=>`<p>${q.h}</p><div class="ansbox">${ta(q.key,q.ph,4)}</div>`).join('')}
       </div>
-      <nav class="lp-nav">${prevL?`<a class="navbtn" href="${hrefOf(prevL)}">← ${labelOf(prevL)}</a>`:'<span></span>'}${nextL?`<a class="navbtn next" href="${hrefOf(nextL)}">${labelOf(nextL)} →</a>`:''}</nav>
+      <nav class="lp-nav"><a class="navbtn" href="${prevHref}">← ${prevLabel}</a>${nextHref?`<a class="navbtn next" href="${nextHref}">${nextLabel} →</a>`:''}</nav>
     </div>
   </div>`;
   bindCommon(V,uid);
@@ -873,10 +872,30 @@ function renderLesson(uid,sid){
   const sl=lessonBlocks(u,sid);
   CALLN=countCallsBefore(u.blocks,sl.idx);CK=countChkItemsBefore(u.blocks,sl.idx);
   const si=u.secs.findIndex(s=>s.id===sid);
+  const chunked=MOD_ORDER.includes(uid);
+  const blockIdx=Math.floor(si/CHUNK_SIZE)+1;
+  const blockStart=(blockIdx-1)*CHUNK_SIZE;
+  const blockEnd=Math.min(blockStart+CHUNK_SIZE,u.secs.length);
+  const blockHasCheck=chunked&&blockEnd<u.secs.length;
   const prevSec=u.secs[si-1],nextSec=u.secs[si+1];
-  let nextHref=null,nextLabel=null;
-  if(nextSec){nextHref=`#/u/${uid}/${nextSec.id}`;nextLabel=esc((nextSec.n?nextSec.n+' ':'')+nextSec.t);}
-  else{
+  let prevHref=null,prevLabel=null,nextHref=null,nextLabel=null;
+  if(chunked&&si===blockStart){
+    const bi=LESSONS.findIndex(l=>l.mod.id===uid&&l.idx===blockIdx);
+    const prevBlock=bi>0?LESSONS[bi-1]:null;
+    if(prevBlock&&prevBlock.hasCheck){
+      prevHref=`#/check/${prevBlock.mod.id}/${prevBlock.idx}`;prevLabel='Prática anterior';
+    }else if(prevBlock){
+      const pl=prevBlock.lessons[prevBlock.lessons.length-1];
+      prevHref=`#/u/${prevBlock.mod.id}/${pl.id}`;prevLabel=esc((pl.n?pl.n+' ':'')+pl.t);
+    }
+  }else if(prevSec){
+    prevHref=`#/u/${uid}/${prevSec.id}`;prevLabel=esc((prevSec.n?prevSec.n+' ':'')+prevSec.t);
+  }
+  if(chunked&&si===blockEnd-1&&blockHasCheck){
+    nextHref=`#/check/${uid}/${blockIdx}`;nextLabel='Praticar o que você viu';
+  }else if(nextSec){
+    nextHref=`#/u/${uid}/${nextSec.id}`;nextLabel=esc((nextSec.n?nextSec.n+' ':'')+nextSec.t);
+  }else{
     const ord=MOD_ORDER.map(id=>byId[id]).filter(Boolean);
     const ci=ord.indexOf(u);
     if(ci>=0&&ord[ci+1]&&ord[ci+1].secs[0]){const nc=ord[ci+1];nextHref=`#/u/${nc.id}/${nc.secs[0].id}`;nextLabel='Próximo módulo: '+esc(nc.title);}
@@ -890,7 +909,7 @@ function renderLesson(uid,sid){
       <p class="crumb"><a href="#/inicio">Trilha</a> › <a href="#/u/${uid}">${esc(u.kind==='mod'?u.short:u.title)}</a> › Aula ${si+1} de ${n}</p>
       <div class="lp-eyebrow">AULA ${esc(sec.n||String(si+1))} · ${esc((TIER_LABEL[tier]||'').toUpperCase())}</div>
       ${R(sl.blocks,uid)}
-      <nav class="lp-nav">${prevSec?`<a class="navbtn" href="#/u/${uid}/${prevSec.id}">← ${esc((prevSec.n?prevSec.n+' ':'')+prevSec.t)}</a>`:'<span></span>'}${nextHref?`<a class="navbtn next" href="${nextHref}">${nextLabel} →</a>`:''}</nav>
+      <nav class="lp-nav">${prevHref?`<a class="navbtn" href="${prevHref}">← ${prevLabel}</a>`:'<span></span>'}${nextHref?`<a class="navbtn next" href="${nextHref}">${nextLabel} →</a>`:''}</nav>
     </div>
     <aside class="lp-side">
       <div class="side-block"><b>Progresso do módulo</b><div class="bar" title="${k}/${n} aulas concluídas"><i style="width:${n?k/n*100:0}%"></i></div></div>
