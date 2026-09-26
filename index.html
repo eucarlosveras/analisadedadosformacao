@@ -668,8 +668,8 @@ function renderHome(){
     stopsHTML=visible.map((l,i)=>{
       const isDone=!!S.sec[l.sec.id],isCur=i===0;
       const state=isDone?'done':isCur?'cur':'';
-      const name=esc((l.sec.n?l.sec.n+' ':'')+l.sec.t);
-      const meta=`${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
+      const name=esc(l.sec.t);
+      const meta=`${l.sec.n?`<span class="mono">${esc(l.sec.n)}</span> · `:''}${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
       let right;
       if(isDone)right='<span class="pill">concluído</span>';
       else if(isCur)right=`<a class="go" href="#/u/${l.mod.id}/${l.sec.id}">Continuar →</a>`;
