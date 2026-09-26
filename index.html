@@ -508,13 +508,19 @@ function groupByTier(secs){
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
+const CHUNK_SIZE=4;
 const LESSONS=(()=>{
   const perMod=MOD_ORDER.map(mid=>{const m=byId[mid];return m?{mod:m,secs:m.secs}:null;}).filter(Boolean);
   const out=[];
   const maxLen=Math.max.apply(null,perMod.map(p=>p.secs.length));
-  for(let round=0;round<maxLen;round++){
+  for(let round=0;round<maxLen;round+=CHUNK_SIZE){
     perMod.forEach(p=>{
-      if(round<p.secs.length){const sec=p.secs[round];out.push({sec,mod:p.mod,tier:sectionTier(sec.t)});}
+      const chunk=p.secs.slice(round,round+CHUNK_SIZE);
+      if(!chunk.length)return;
+      chunk.forEach(sec=>out.push({kind:'sec',sec,mod:p.mod,tier:sectionTier(sec.t)}));
+      if(round+CHUNK_SIZE<p.secs.length){
+        out.push({kind:'check',mod:p.mod,lessons:chunk,idx:round/CHUNK_SIZE+1});
+      }
     });
   }
   out.forEach((x,i)=>x.n=i+1);
@@ -615,6 +621,7 @@ function route(){
   const h=location.hash||'#/inicio';const p=h.slice(2).split('/');
   let target=null,uid=null;
 if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s=>s.id===target))renderLesson(uid,target);else renderCourse(uid);}
+  else if(p[0]==='check'&&byId[p[1]]){uid=p[1];renderCheck(uid,parseInt(p[2],10)||1);}
   else if(p[0]==='guia')renderGuia();else if(p[0]==='painel')renderPainel();
   else if(p[0]==='busca')renderBusca(decodeURIComponent(p[1]||''));else if(p[0]==='materiais')renderMateriais();
   else renderHome();
@@ -724,7 +731,8 @@ function initBgConst(){
   tick();
 }
 function renderHome(){
-  let streak=0;for(const l of LESSONS){if(S.sec[l.sec.id])streak++;else break;}
+  const lid=l=>l.kind==='check'?l.mod.id+'-chk'+l.idx:l.sec.id;
+  let streak=0;for(const l of LESSONS){if(S.sec[lid(l)])streak++;else break;}
   const total=LESSONS.length;
   let stopsHTML='',lede;
   if(streak>=total){
@@ -732,17 +740,27 @@ function renderHome(){
   }else{
     const visible=LESSONS.slice(streak,streak+10);
     stopsHTML=visible.map((l,i)=>{
-      const isDone=!!S.sec[l.sec.id],isCur=i===0;
+      const id=lid(l);
+      const isDone=!!S.sec[id],isCur=i===0;
       const state=isDone?'done':isCur?'cur':'';
-      const name=esc(l.sec.t);
-      const meta=`${l.sec.n?`<span class="mono">${esc(l.sec.n)}</span> · `:''}${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
+      let name,meta,href,node;
+      if(l.kind==='check'){
+        name='Aplique o que você viu';
+        meta=`${l.lessons.length} aulas · ${esc(l.mod.short)} · Prática`;
+        href=`#/check/${l.mod.id}/${l.idx}`;
+        node=isDone?'✓':isCur?'●':'✎';
+      }else{
+        name=esc(l.sec.t);
+        meta=`${l.sec.n?`<span class="mono">${esc(l.sec.n)}</span> · `:''}${esc(l.mod.short)} · ${esc(TIER_LABEL[l.tier])}`;
+        href=`#/u/${l.mod.id}/${l.sec.id}`;
+        node=isDone?'✓':isCur?'●':String(i+1);
+      }
       let right;
       if(isDone)right='<span class="pill">concluído</span>';
-      else if(isCur)right=`<a class="go" href="#/u/${l.mod.id}/${l.sec.id}">Continuar →</a>`;
+      else if(isCur)right=`<a class="go" href="${href}">${l.kind==='check'?'Praticar':'Continuar'} →</a>`;
       else if(i===1)right='<span class="pill">a seguir</span>';
       else right='<span class="pill">bloqueado</span>';
-      const node=isDone?'✓':isCur?'●':String(i+1);
-      return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="#/u/${l.mod.id}/${l.sec.id}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
+      return `<div class="stop ${state}"><div class="node">${node}</div><div class="stop-body"><div><a href="${href}" style="color:inherit;text-decoration:none"><div class="stop-name">${name}</div></a><div class="stop-meta">${meta}</div></div>${right}</div></div>`;
     }).join('');
     lede='Analista de Dados';
   }
@@ -753,6 +771,45 @@ function renderHome(){
   <div class="metro">${stopsHTML}</div>
   <p class="sub" style="margin-top:1.4rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>`;
   initBgConst();
+}
+function renderCheck(uid,idx){
+  const u=byId[uid];
+  const start=(idx-1)*CHUNK_SIZE;
+  const lessons=u?u.secs.slice(start,start+CHUNK_SIZE):[];
+  if(!u||!lessons.length){renderHome();return;}
+  S.last=uid;save();
+  const checkId=uid+'-chk'+idx;
+  const done=!!S.sec[checkId];
+  const names=lessons.map(s=>(s.n?s.n+' ':'')+s.t);
+  const a=names[0],b=names[names.length-1],c=names[Math.min(1,names.length-1)];
+  const listHTML=lessons.map(s=>`<li><a href="#/u/${uid}/${s.id}">${esc((s.n?s.n+' ':'')+s.t)}</a></li>`).join('');
+  const qs=[
+    {key:checkId+'-q1',ph:'Descreva o cenário e a decisão que isso ajudaria a tomar…',
+     h:`Descreva uma situação real — do seu trabalho, de um projeto pessoal, ou hipotética — em que você usaria <strong>${esc(a)}</strong> e <strong>${esc(b)}</strong> juntos. Que decisão isso ajudaria a tomar?`},
+    {key:checkId+'-q2',ph:'Explique com um exemplo simples, sem jargão…',
+     h:`Se precisasse explicar <strong>${esc(c)}</strong> para alguém sem experiência técnica, que exemplo do dia a dia você usaria?`},
+    {key:checkId+'-q3',ph:'Seja honesto(a): o que ainda não está sólido?',
+     h:'Destas aulas, qual você tem menos confiança de aplicar sozinho(a)? O que faria essa semana para testar isso na prática?'},
+  ];
+  const li=LESSONS.findIndex(l=>l.kind==='check'&&l.mod.id===uid&&l.idx===idx);
+  const prevL=li>0?LESSONS[li-1]:null;
+  const nextL=(li>=0&&li<LESSONS.length-1)?LESSONS[li+1]:null;
+  const hrefOf=l=>l.kind==='check'?`#/check/${l.mod.id}/${l.idx}`:`#/u/${l.mod.id}/${l.sec.id}`;
+  const labelOf=l=>l.kind==='check'?'Prática':esc((l.sec.n?l.sec.n+' ':'')+l.sec.t);
+  V.innerHTML=`<div class="lesson-page">
+    <div class="lp-main" id="art">
+      <p class="crumb"><a href="#/inicio">Trilha</a> › <a href="#/u/${uid}">${esc(u.kind==='mod'?u.short:u.title)}</a> › Prática</p>
+      <div class="lp-eyebrow">PRÁTICA · ${esc(u.short||u.title).toUpperCase()}</div>
+      <h2 class="sec"><span class="hn2 nb">✎</span><span>Aplique o que você viu</span><label class="secchk" title="Marque quando terminar esta prática"><input type="checkbox" data-sec="${checkId}" ${done?'checked':''}> concluída</label></h2>
+      <p>Antes de seguir, revise rapidinho o que você acabou de estudar:</p>
+      <ul>${listHTML}</ul>
+      <div class="call k-exercicios"><p class="lab">${svg('exercicios')}Teste de conhecimento — aplicação na vida real</p>
+        ${qs.map(q=>`<p>${q.h}</p><div class="ansbox">${ta(q.key,q.ph,4)}</div>`).join('')}
+      </div>
+      <nav class="lp-nav">${prevL?`<a class="navbtn" href="${hrefOf(prevL)}">← ${labelOf(prevL)}</a>`:'<span></span>'}${nextL?`<a class="navbtn next" href="${hrefOf(nextL)}">${labelOf(nextL)} →</a>`:''}</nav>
+    </div>
+  </div>`;
+  bindCommon(V,uid);
 }
 function renderGuia(){
   const kinds=['objetivos','dica','atencao','exemplo','ia','exercicios','gabarito','miniprojeto','autoavaliacao'];
