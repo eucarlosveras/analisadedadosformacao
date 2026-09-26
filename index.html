@@ -108,7 +108,8 @@ p,li{max-width:var(--measure)}
 .acell small{position:absolute;top:.55rem;left:.6rem;font-family:var(--f-mono);font-size:.62rem;font-weight:500;opacity:.85;letter-spacing:0;text-transform:uppercase}
 .hero h1{margin:0}
 .homehero .hero{align-items:start}
-.homehero h1{font-size:clamp(1.6rem,3vw,2.1rem);max-width:17ch;line-height:1.03}
+.homehero h1{font-size:clamp(1.9rem,3.6vw,2.5rem);max-width:17ch;line-height:1.04;letter-spacing:-.02em}
+.homehero h1 .accent{color:var(--accent)}
 .homehero .lede{font-size:1.1rem;max-width:56ch;margin:.8rem 0 1.2rem;color:var(--muted)}
 .homehero .acts{display:flex;gap:.6rem;flex-wrap:wrap}
 #bgConst{position:fixed;inset:0;pointer-events:none;opacity:.55;display:none}
@@ -746,7 +747,7 @@ function renderHome(){
     lede='Analista de Dados';
   }
   V.innerHTML=`<canvas id="bgConst" aria-hidden="true"></canvas><div class="sheet homehero"><div class="hero"><div class="acell" aria-hidden="true"><small>trilha</small>${streak}/${total}</div><div>
-  <h1>Cronograma de estudos</h1>
+  <h1>Caminho dos <span class="accent">Dados</span></h1>
   <p class="lede">${lede}</p>
   </div></div></div>
   <div class="metro">${stopsHTML}</div>
