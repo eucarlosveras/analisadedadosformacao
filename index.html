@@ -501,6 +501,16 @@ td code,th code{white-space:nowrap}
 .vid-add input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .vid-hint{font-size:.75rem;color:var(--faint);margin:.55rem 0 0}
 .vid-empty{grid-column:1/-1;color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:12px;padding:1.3rem;text-align:center}
+
+/* videos curados (recomendados do modulo) */
+.vids-cur .vid-grid{grid-template-columns:minmax(0,520px)}
+.vid-cap{margin-top:.55rem}
+.vid-cap b{font-family:var(--f-head);font-size:.9rem;color:var(--ink);display:block;line-height:1.3}
+.vid-cap span{font-size:.78rem;color:var(--muted)}
+
+.vid-tools{margin:.2rem 0 1.1rem}
+.vid-subh{font-family:var(--f-head);font-weight:700;font-size:.9rem;color:var(--ink);margin:.4rem 0 .5rem}
+.vids-cur .vid-cap span{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -677,6 +687,10 @@ const MC={m1:'#234E82',m2:'#1F8A5B',m3:'#7A4DB8',m4:'#0E7C86',m5:'#D98A1F',m6:'#
 U.forEach(u=>u.color=MC[u.id]||'#234E82');
 const byId={};U.forEach(u=>byId[u.id]=u);
 const MODS=U.filter(u=>u.kind==='mod');
+const VID_CUR={'m1-s1':[{id:'i9J_yQpgfpE',t:'O que faz o Analista de Dados',a:'Bruce Fonseca — Dados + IA'}],'m2-s1':[{id:'S1_ClacUPoI',t:'Análise de Dados no Excel para Iniciantes',a:'Curso de Excel Online'}],'m3-s1':[{id:'m3g-fH1Pxuk',t:'Estatística para Ciência de Dados e Machine Learning',a:'IA Expert Academy'}],'m4-s1':[{id:'6M-jFECiHog',t:'Curso SQL para Iniciantes',a:'Hashtag Programação'}],'m5-s1':[{id:'hTf-kmAtfLc',t:'Aprenda Power BI em 1 hora — Curso Básico',a:'Planilheiros'}],'m6-s1':[{id:'1JpYOqvDJNU',t:'Tudo sobre Pandas para análise de dados com Python',a:'Asimov Academy'}],'m7-s1':[{id:'zwUs83EH6w8',t:'Modelagem multidimensional (Star schema e Snowflake)',a:'Prof. Claudio Bonel'}],'m8-s1':[{id:'192HgwRgOYE',t:'Git e GitHub — Aprenda o essencial em 2 horas',a:'Victor Lima'}],'m9-s1':[{id:'qoLJa3EA3dg',t:'Storytelling com Dados: o que é e como fazer',a:'Larissa Perfeito'}],'m10-s1':[{id:'4vx2kio6UO8',t:'Como criar um portfólio para Analista de Dados',a:'Dados de Valor'}],'m11-s1':[{id:'Vqtdi3Uf-14',t:'Como fazer análise de dados no ChatGPT',a:'Hashtag Treinamentos'}],'m12-s1':[{id:'-CbFz9cvWhE',t:'Guia de Carreira: Engenharia de Dados',a:'Alura'}],'m13-s1':[{id:'ANkrrduTtu0',t:'O que é ETL? Simplificando ETL',a:'Simplificando Redes'}],'m14-s1':[{id:'EIp1YZpJ2Mw',t:'Indicadores e KPIs na prática, do zero',a:'Ale Saito — Eduka Negócios'}],'m15-s1':[{id:'guLmw0oAZyU',t:'Publicar e compartilhar relatórios no Power BI',a:'Prof Ítalo Teotônio'}]};
+const MOD_KW={m1:'análise de dados',m2:'Excel',m3:'estatística',m4:'SQL',m5:'Power BI',m6:'Python pandas',m7:'modelagem de dados',m8:'ferramentas de dados',m9:'dados carreira',m10:'analista de dados portfólio',m11:'IA análise de dados',m12:'engenharia de dados',m13:'ETL SQL',m14:'métricas de negócio KPI',m15:'Power BI Tableau'};
+function curVideoHTML(uid){const v=(VID_CUR[uid]||[])[0];if(!v)return '';return '<section class="vids vids-cur" aria-label="Vídeo recomendado do módulo"><h2 class="sec"><span class="hn2 nb">▶</span><span>Vídeo recomendado</span></h2><div class="vid-grid"><div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.t)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="vid-cap"><b>'+esc(v.t)+'</b><span>'+esc(v.a)+'</span></div></div></div></section>';}
+
 const allSecs=()=>U.flatMap(u=>u.secs);
 const secDone=u=>u.secs.filter(s=>S.sec[s.id]).length;
 function sectionTier(t){
@@ -1046,6 +1060,7 @@ function renderCourse(uid){
   </div>
   ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}</div></a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
   <div class="meta" style="margin-top:1.4rem">${u.kind==='mod'||uid==='projetos'?`<button class="btn ${dd?'':'primary'}" id="donebtn" aria-pressed="${!!dd}">${dd?'✔ Concluído em '+fmtD(dd):'Marcar módulo como concluído'}</button>`:''}<button class="btn" id="bmbtn" aria-pressed="${!!S.bm[uid]}">${S.bm[uid]?'★ Nos favoritos':'☆ Favoritar'}</button></div>
+  ${curVideoHTML(uid)}
   <h2 id="notas"><span class="hn2 nb">✎</span><span>Minhas anotações</span></h2>
   ${ta(uid+'-notas','Resumo com suas palavras, dúvidas, links úteis…',8)}
   </div>`;
@@ -1111,7 +1126,10 @@ function renderLesson(uid,sid){
       </div>
       ${R(sl.blocks,uid)}
       <section class="vids" aria-label="Vídeos da aula">
-        <h2 class="sec"><span class="hn2 nb">▶</span><span>Vídeos da aula</span></h2>
+        <h2 class="sec"><span class="hn2 nb">▶</span><span>Vídeos sobre este assunto</span></h2>
+        <div class="vid-grid vids-cur" id="vidcur"></div>
+        <div class="vid-tools"><button class="btn" id="vidsearch" type="button">🔎 Buscar vídeos deste assunto no YouTube</button></div>
+        <p class="vid-subh">Seus vídeos</p>
         <div class="vid-grid" id="vidgrid"></div>
         <div class="vid-add"><input type="url" id="vidinput" inputmode="url" placeholder="Cole um link do YouTube — youtube.com/watch?v=… ou youtu.be/…"><button class="btn primary" id="vidadd" type="button">Adicionar vídeo</button></div>
         <p class="vid-hint">Os vídeos ficam salvos neste navegador e no seu backup (exportação).</p>
@@ -1406,7 +1424,7 @@ function openQuiz(uid,sid){const q=quizBuild(uid,sid);if(q.questions.length<3){s
   ST_KEYHANDLER=e=>{if(!answered){const n=parseInt(e.key,10);const opts=q.questions[i].options;if(n>=1&&n<=opts.length){const btns=$$('.qz-opt',optsEl);choose(n-1,btns[n-1]);}}else if(e.key==='Enter'){nextBtn.click();}};
 }
 function ytId(u){u=String(u||'').trim();const m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtube-nocookie\.com\/embed\/)([A-Za-z0-9_-]{11})/);if(m)return m[1];if(/^[A-Za-z0-9_-]{11}$/.test(u))return u;return null;}
-function initVideos(uid,sid){const grid=$('#vidgrid');if(!grid)return;S.vid=S.vid||{};const render=()=>{const list=S.vid[sid]||[];if(!list.length){grid.innerHTML='<div class="vid-empty">Nenhum v\u00eddeo ainda. Cole um link do YouTube abaixo para adicionar.</div>';return;}grid.innerHTML=list.map(id=>'<div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="V\u00eddeo do YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><button class="vid-rm" type="button" data-id="'+id+'" aria-label="Remover v\u00eddeo">\u2715</button></div>').join('');$$('.vid-rm',grid).forEach(b=>b.onclick=()=>{S.vid[sid]=(S.vid[sid]||[]).filter(x=>x!==b.dataset.id);if(!S.vid[sid].length)delete S.vid[sid];save();render();});};const input=$('#vidinput'),addBtn=$('#vidadd');const add=()=>{if(!input)return;const id=ytId(input.value);if(!id){toast('Link do YouTube inv\u00e1lido');return;}S.vid[sid]=S.vid[sid]||[];if(S.vid[sid].indexOf(id)>=0){toast('Esse v\u00eddeo j\u00e1 foi adicionado');input.value='';return;}S.vid[sid].push(id);save();input.value='';render();toast('V\u00eddeo adicionado');if(typeof gamAward==='function')gamAward('vid:'+sid+':'+todayStr(),3,'V\u00eddeo adicionado');};if(addBtn)addBtn.onclick=add;if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});render();}
+function initVideos(uid,sid){const grid=$('#vidgrid');if(!grid)return;S.vid=S.vid||{};const cur=$('#vidcur');if(cur){const v=(VID_CUR[sid]||[])[0];cur.innerHTML=v?('<div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.t)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="vid-cap"><b>'+esc(v.t)+'</b><span>Recomendado · '+esc(v.a)+'</span></div></div>'):'';}const sb=$('#vidsearch');if(sb){const uu=byId[uid];const sec=uu&&uu.secs?uu.secs.find(s=>s.id===sid):null;const kw=MOD_KW[uid]||'análise de dados';const q=encodeURIComponent(((sec&&sec.t)||'')+' '+kw);sb.onclick=()=>window.open('https://www.youtube.com/results?search_query='+q,'_blank','noopener');}const render=()=>{const list=S.vid[sid]||[];if(!list.length){grid.innerHTML='<div class="vid-empty">Você ainda não salvou vídeos aqui. Cole um link do YouTube abaixo.</div>';return;}grid.innerHTML=list.map(id=>'<div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Vídeo do YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><button class="vid-rm" type="button" data-id="'+id+'" aria-label="Remover vídeo">✕</button></div>').join('');$$('.vid-rm',grid).forEach(b=>b.onclick=()=>{S.vid[sid]=(S.vid[sid]||[]).filter(x=>x!==b.dataset.id);if(!S.vid[sid].length)delete S.vid[sid];save();render();});};const input=$('#vidinput'),addBtn=$('#vidadd');const add=()=>{if(!input)return;const id=ytId(input.value);if(!id){toast('Link do YouTube inválido');return;}S.vid[sid]=S.vid[sid]||[];if(S.vid[sid].indexOf(id)>=0){toast('Esse vídeo já foi adicionado');input.value='';return;}S.vid[sid].push(id);save();input.value='';render();toast('Vídeo adicionado');if(typeof gamAward==='function')gamAward('vid:'+sid+':'+todayStr(),3,'Vídeo adicionado');};if(addBtn)addBtn.onclick=add;if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});render();}
 function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{const k=b.dataset.study;if(k==='flash'){gamAward('fc:'+sid+':'+todayStr(),5,'Revisão de flashcards');openFlashcards(uid,sid);}else if(k==='quiz'){openQuiz(uid,sid);}else openMindmap(uid,sid);};});const _qb=V.querySelector('[data-study="quiz"]');if(_qb){try{if(quizBuild(uid,sid).questions.length<3)_qb.style.display='none';}catch(e){}}}
 
 /* ---------- Gamificacao: ofensiva (streak), XP, niveis, XP semanal ---------- */
