@@ -369,6 +369,59 @@ td code,th code{white-space:nowrap}
 .mm-scroll{width:100%;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
 .mm-scroll svg{display:block}
 @media (prefers-reduced-motion:reduce){.fc-inner{transition:none}.smodal{animation:none}.stbtn:hover{transform:none}}
+
+/* ===== Gamificacao: ofensiva (streak), XP, niveis ===== */
+.gam-chip{display:inline-flex;align-items:center;gap:.42rem;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);border-radius:999px;padding:.3rem .72rem;cursor:pointer;font-family:var(--f-head);font-weight:700;color:#E9F0FA;min-height:38px;line-height:1;transition:background .15s,border-color .15s,transform .1s}
+.gam-chip:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.32)}
+.gam-chip:active{transform:translateY(1px)}
+.gc-fire{width:18px;height:18px;fill:rgba(255,255,255,.45);transition:fill .2s,filter .2s;flex:none}
+.gam-chip.on .gc-fire{fill:#FFB23E;filter:drop-shadow(0 0 5px rgba(255,150,40,.6))}
+.gc-n{font-size:.98rem;min-width:1ch;text-align:center}
+.gam-chip.on .gc-n{color:#FFC46B}
+.gc-sep{width:1px;height:15px;background:rgba(255,255,255,.18)}
+.gc-lv{font-family:var(--f-mono);font-size:.68rem;color:rgba(233,240,250,.75);font-weight:600}
+@media (max-width:560px){.gc-sep,.gc-lv{display:none}.gam-chip{padding:.3rem .62rem}}
+.gm-hero{display:flex;align-items:center;gap:1rem;padding:1.1rem 1.2rem;border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--orange) 16%,var(--panel)),var(--panel));border:1px solid var(--line);margin-bottom:1.1rem}
+.gm-flame{position:relative;width:64px;height:64px;flex:none;display:grid;place-items:center}
+.gm-flame svg{width:58px;height:58px;fill:var(--faint)}
+.gm-flame.on svg{fill:var(--orange);filter:drop-shadow(0 3px 8px color-mix(in srgb,var(--orange) 45%,transparent))}
+.gm-flame-n{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-head);font-weight:800;font-size:1.2rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);padding-top:7px}
+.gm-hero-txt b{font-family:var(--f-head);font-size:1.22rem;display:block;color:var(--ink)}
+.gm-hero-txt span{font-size:.86rem;color:var(--muted)}
+.gm-rings{display:flex;gap:1.4rem;justify-content:center;margin-bottom:1.2rem;flex-wrap:wrap}
+.gm-ring{--p:0;--rc:var(--accent);display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.gm-ring-c{width:112px;height:112px;border-radius:50%;background:conic-gradient(var(--rc) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;position:relative}
+.gm-ring-c::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--panel)}
+.gm-ring-in{position:relative;z-index:1;text-align:center;line-height:1.15}
+.gm-ring-in b{font-family:var(--f-head);font-size:1.4rem;color:var(--ink);display:block}
+.gm-ring-in span{font-size:.66rem;color:var(--muted)}
+.gm-ring-lb{font-family:var(--f-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.gm-level{border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:1.2rem;background:var(--panel2)}
+.gm-lv-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem}
+.gm-lv-badge{font-family:var(--f-head);font-weight:800;font-size:1rem;color:var(--accent-ink);background:var(--accent);border-radius:10px;padding:.42rem .62rem;flex:none}
+.gm-lv-top b{font-family:var(--f-head);font-size:1.05rem;color:var(--ink);display:block}
+.gm-lv-top span{font-size:.8rem;color:var(--muted)}
+.gm-bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden}
+.gm-bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .5s}
+.gm-lv-next{display:block;margin-top:.5rem;font-size:.76rem;color:var(--faint)}
+.gm-sub{font-family:var(--f-head);font-weight:700;font-size:.95rem;margin:0 0 .6rem;color:var(--ink)}
+.gm-week{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;margin-bottom:1.2rem}
+.gm-day{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.5rem .2rem;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.gm-day-l{font-family:var(--f-mono);font-size:.66rem;color:var(--muted);text-transform:uppercase}
+.gm-day-d{font-size:1rem;height:1.2em;line-height:1}
+.gm-day.done{border-color:color-mix(in srgb,var(--orange) 45%,transparent);background:color-mix(in srgb,var(--orange) 12%,transparent)}
+.gm-day.part{border-color:var(--accent-line);background:var(--accent-dim)}
+.gm-day.fut{opacity:.45}
+.gm-day.today{box-shadow:0 0 0 2px var(--accent)}
+.gm-perks{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.gm-perk{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:.35rem .7rem;background:var(--panel2)}
+.gm-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.6rem}
+.gm-badge{display:flex;gap:.55rem;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:.7rem;background:var(--panel)}
+.gm-badge .ic{font-size:1.3rem;line-height:1;flex:none}
+.gm-badge b{font-family:var(--f-head);font-size:.85rem;color:var(--ink);display:block}
+.gm-badge span{font-size:.72rem;color:var(--muted)}
+.gm-badge.lock{opacity:.45;filter:grayscale(1)}
+.gm-legend{margin-top:1rem;font-size:.76rem;color:var(--faint);line-height:1.55}
 </style>
 </head>
 <body>
@@ -380,6 +433,7 @@ td code,th code{white-space:nowrap}
 <details class="menu" id="modmenu"><summary aria-label="Abrir índice de módulos">Módulos ▾</summary><div class="menupanel" id="menupanel"></div></details>
     <a class="btn hide-focus" href="#/busca" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="lbl">Buscar</span></a>
     <a class="btn hide-focus" href="#/painel" aria-label="Meu progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Progresso</span></a>
+    <button class="gam-chip" id="gamchip" type="button" title="Ofensiva, XP e nível" aria-label="Abrir meu progresso, ofensiva e XP"><svg class="gc-fire" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.2 3.4-1 4.6-1 6.8a3 3 0 0 0 5.8.9c1.6 2 2.2 3.7 2.2 5.6A7 7 0 1 1 6.2 12c1.2 1.2 2.4 1.1 3 0 .9-1.7-.7-3.3.4-5C10.8 5.6 12 4.2 12 2z"/></svg><span class="gc-n" id="gcstreak">0</span><span class="gc-sep"></span><span class="gc-lv" id="gclv">Nv 1</span></button>
     <button class="btn ico" id="fontbtn" title="Tamanho da fonte" aria-label="Tamanho da fonte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.5 5h1L15 19M5 14h7M17 10h5M19.5 7.5v5"/></svg></button>
     <button class="btn ico" id="focusbtn" aria-pressed="false" title="Modo foco" aria-label="Modo foco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
     <button class="btn ico" id="themebtn" aria-pressed="false" title="Modo noturno" aria-label="Modo noturno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
@@ -685,7 +739,7 @@ if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s
   markSide(uid,target);
   document.body.classList.remove('sideopen');
   decorate(p);
-  window.scrollTo(0,0);$('#main').focus({preventScroll:true});
+  window.scrollTo(0,0);$('#main').focus({preventScroll:true});updGam();
 }
 const kw=w=>`<span class="kw">${w}</span>`,st=w=>`<span class="st">'${esc(w)}'</span>`,nu=w=>`<span class="nu">${w}</span>`;
 const Q={inicio:'trilha',guia:'guia',painel:'painel',busca:'busca',materiais:'backup'};
@@ -707,8 +761,8 @@ window.addEventListener('hashchange',route);
 /* ---------- common binders ---------- */
 function bindCommon(root,uid){
   $$('textarea[data-k]',root).forEach(t=>t.addEventListener('input',()=>{S.ans[t.dataset.k]=t.value;save();const s=root.querySelector(`[data-s="${t.dataset.k}"]`);if(s)s.textContent='Salvo neste navegador';}));
-  $$('input[data-ck]',root).forEach(c=>c.addEventListener('change',()=>{S.chk[c.dataset.ck]=c.checked;save();}));
-  $$('input[data-sec]',root).forEach(c=>c.addEventListener('change',()=>{S.sec[c.dataset.sec]=c.checked?Date.now():0;if(!c.checked)delete S.sec[c.dataset.sec];save();markSide(uid,null);updToc(uid);}));
+  $$('input[data-ck]',root).forEach(c=>c.addEventListener('change',()=>{S.chk[c.dataset.ck]=c.checked;save();if(c.checked)gamAward('ck:'+c.dataset.ck,3,'Item concluído');}));
+  $$('input[data-sec]',root).forEach(c=>c.addEventListener('change',()=>{S.sec[c.dataset.sec]=c.checked?Date.now():0;if(!c.checked)delete S.sec[c.dataset.sec];save();markSide(uid,null);updToc(uid);if(c.checked)gamAward('sec:'+c.dataset.sec,10,'Aula concluída');}));
   $$('[data-copy]',root).forEach(b=>b.addEventListener('click',()=>{const t=b.closest('figure').querySelector('code').textContent;
     const ok=()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar',1500);};
     if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>fallbackCopy(t,ok));else fallbackCopy(t,ok);}));
@@ -909,7 +963,7 @@ function renderCourse(uid){
   ${ta(uid+'-notas','Resumo com suas palavras, dúvidas, links úteis…',8)}
   </div>`;
   bindCommon(V,uid);
-  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Módulo concluído. Bom trabalho!');}save();renderCourse(uid);};
+  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Módulo concluído. Bom trabalho!');gamAward('done:'+uid,60,'Módulo concluído');}save();renderCourse(uid);};
   const bb=$('#bmbtn');if(bb)bb.onclick=()=>{S.bm[uid]=!S.bm[uid];save();bb.textContent=S.bm[uid]?'★ Nos favoritos':'☆ Favoritar';bb.setAttribute('aria-pressed',!!S.bm[uid]);};
 }
 function lessonBlocks(u,sid){
@@ -1240,10 +1294,45 @@ function openMindmap(uid,sid){
   w.querySelector('[data-mm="zout"]').onclick=()=>{zoom=Math.max(0.5,zoom-0.2);applyZoom();};
   w.querySelector('[data-mm="dl"]').onclick=()=>{const s=new XMLSerializer().serializeToString(svgEl);dl('mapa-mental-'+sid+'.svg','<?xml version="1.0" encoding="UTF-8"?>\n'+s,'image/svg+xml');toast('Mapa mental exportado');};
 }
-function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{if(b.dataset.study==='flash')openFlashcards(uid,sid);else openMindmap(uid,sid);};});}
+function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{if(b.dataset.study==='flash'){gamAward('fc:'+sid+':'+todayStr(),5,'Revisão de flashcards');openFlashcards(uid,sid);}else openMindmap(uid,sid);};});}
+
+/* ---------- Gamificacao: ofensiva (streak), XP, niveis, XP semanal ---------- */
+const DAILY_GOAL=30,WEEK_GOAL=200;
+const gamPad=n=>String(n).padStart(2,'0');
+const dateStrOf=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+gamPad(d.getMonth()+1)+'-'+gamPad(d.getDate());};
+const todayStr=()=>dateStrOf(Date.now());
+const dParse=ds=>{const p=String(ds).split('-');return new Date(+p[0],(+p[1]||1)-1,+p[2]||1).getTime();};
+const dayDiff=(a,b)=>Math.round((dParse(b)-dParse(a))/86400000);
+const dateAdd=(ds,n)=>dateStrOf(dParse(ds)+n*86400000);
+const weekKey=ds=>{const off=(new Date(dParse(ds)).getDay()+6)%7;return dateAdd(ds,-off);};
+function gamLevel(xp){let lvl=1,need=100,acc=0;while(xp>=acc+need){acc+=need;lvl++;need=Math.round(need*1.32);}return {lvl,into:xp-acc,need,acc};}
+function gamTitle(l){return l>=16?'Mestre dos Dados':l>=13?'Especialista em Dados':l>=10?'Analista S\u00eanior':l>=7?'Analista Pleno':l>=5?'Analista J\u00fanior':l>=3?'Explorador de Dados':'Iniciante';}
+function weekXP(){const wk=weekKey(todayStr());let s=0;const L=(S.gam&&S.gam.log)||{};for(const ds in L){if(weekKey(ds)===wk)s+=L[ds];}return s;}
+function gamRecompute(){const g=S.gam;if(!g)return;const set={};for(const d in g.log){if(g.log[d]>=DAILY_GOAL)set[d]=1;}for(const d in (g.frozen||{}))set[d]=1;const days=Object.keys(set).sort();if(!days.length){g.streak=0;g.lastGoalDay='';return;}let best=1,run=1;for(let i=1;i<days.length;i++){if(dayDiff(days[i-1],days[i])===1)run++;else run=1;if(run>best)best=run;}g.best=Math.max(g.best||0,best);const last=days[days.length-1];let s=1;for(let i=days.length-1;i>0;i--){if(dayDiff(days[i-1],days[i])===1)s++;else break;}g.streak=(dayDiff(last,todayStr())>1)?0:s;g.lastGoalDay=last;}
+function gamFreezeBridge(ds){const g=S.gam;g.frozen=g.frozen||{};const gd=[];for(const d in g.log){if(d!==ds&&g.log[d]>=DAILY_GOAL)gd.push(d);}for(const d in g.frozen)if(d!==ds)gd.push(d);gd.sort();if(!gd.length)return;const prev=gd[gd.length-1];const gap=dayDiff(prev,ds);if(gap>=2){const missing=gap-1;if((g.freezes||0)>0&&missing<=g.freezes){for(let k=1;k<gap;k++)g.frozen[dateAdd(prev,k)]=1;g.freezes-=missing;toast('\ud83d\udee1\ufe0f Ofensiva protegida ('+missing+' dia'+(missing>1?'s':'')+')');}}}
+function gamWeekCheck(){const g=S.gam;const wk=weekKey(todayStr());if(weekXP()>=WEEK_GOAL&&g.lastWeekAward!==wk){g.lastWeekAward=wk;g.weekBadges=(g.weekBadges||0)+1;g.freezes=Math.min(3,(g.freezes||0)+1);setTimeout(()=>toast('\ud83c\udfc6 Meta semanal batida! +1 prote\u00e7\u00e3o de ofensiva'),500);}}
+function gamAward(key,amount,reason){const g=S.gam;if(!g)return;if(key){if(g.awarded[key])return;g.awarded[key]=1;}const ds=todayStr();const before=g.log[ds]||0;g.log[ds]=before+amount;g.xp+=amount;const crossed=before<DAILY_GOAL&&g.log[ds]>=DAILY_GOAL;const lb=gamLevel(g.xp-amount).lvl,la=gamLevel(g.xp).lvl;if(crossed)gamFreezeBridge(ds);gamWeekCheck();gamRecompute();save();updGam();if(la>lb)toast('\u2b06\ufe0f N\u00edvel '+la+' \u2014 '+gamTitle(la)+'!');else if(crossed)toast('\ud83d\udd25 Meta di\u00e1ria! Ofensiva de '+g.streak+' dia'+(g.streak>1?'s':''));else if(reason)toast('+'+amount+' XP \u00b7 '+reason);}
+function gamInit(){if(S.gam&&S.gam.v===1){gamRecompute();return;}const g={xp:0,log:{},awarded:{},frozen:{},streak:0,best:0,lastGoalDay:'',freezes:0,weekBadges:0,lastWeekAward:'',v:1};const add=(ts,amt,key)=>{if(!ts)return;const ds=dateStrOf(ts);g.log[ds]=(g.log[ds]||0)+amt;g.xp+=amt;g.awarded[key]=1;};for(const id in (S.sec||{}))add(S.sec[id],10,'sec:'+id);for(const id in (S.done||{}))add(S.done[id],60,'done:'+id);S.gam=g;gamRecompute();save();}
+function updGam(){const g=S.gam;const chip=$('#gamchip');if(!chip||!g)return;const on=g.streak>0&&dayDiff(g.lastGoalDay,todayStr())<=1;chip.classList.toggle('on',!!on);const ns=$('#gcstreak');if(ns)ns.textContent=g.streak;const nl=$('#gclv');if(nl)nl.textContent='Nv '+gamLevel(g.xp).lvl;}
+function openGam(){let g=S.gam;if(!g){gamInit();g=S.gam;}const t=todayStr();const lv=gamLevel(g.xp);const dxp=g.log[t]||0;const wxp=weekXP();const dpct=Math.min(100,Math.round(dxp/DAILY_GOAL*100));const wpct=Math.min(100,Math.round(wxp/WEEK_GOAL*100));const lvpct=Math.min(100,Math.round(lv.into/lv.need*100));const on=g.streak>0&&dayDiff(g.lastGoalDay,t)<=1;const dd=dayDiff(g.lastGoalDay,t);const risk=(dd===0)?'Meta de hoje conclu\u00edda \u2705':((dd===1&&dxp<DAILY_GOAL)?'Estude hoje para manter a ofensiva!':(g.streak===0?'Comece sua ofensiva hoje \ud83d\udd25':'Continue firme!'));
+  const flameSVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.2 3.4-1 4.6-1 6.8a3 3 0 0 0 5.8.9c1.6 2 2.2 3.7 2.2 5.6A7 7 0 1 1 6.2 12c1.2 1.2 2.4 1.1 3 0 .9-1.7-.7-3.3.4-5C10.8 5.6 12 4.2 12 2z"/></svg>';
+  const dayL=['seg','ter','qua','qui','sex','s\u00e1b','dom'];const wkMon=weekKey(t);let week='';for(let i=0;i<7;i++){const ds=dateAdd(wkMon,i);const xp=g.log[ds]||0;const fut=dayDiff(t,ds)>0;let cls=fut?'fut':(xp>=DAILY_GOAL?'done':(xp>0?'part':'miss'));if(ds===t)cls+=' today';week+='<div class="gm-day '+cls+'"><span class="gm-day-l">'+dayL[i]+'</span><span class="gm-day-d">'+(xp>=DAILY_GOAL?'\ud83d\udd25':(xp>0?'\u2022':''))+'</span></div>';}
+  const anyLesson=Object.keys(S.sec||{}).some(k=>S.sec[k]);
+  const badges=[{ic:'\ud83c\udfaf',t:'Primeiros passos',d:'Concluir a 1\u00aa aula',ok:anyLesson},{ic:'\ud83d\udd25',t:'Pegando o ritmo',d:'Ofensiva de 3 dias',ok:g.best>=3},{ic:'\u26a1',t:'Em chamas',d:'Ofensiva de 7 dias',ok:g.best>=7},{ic:'\ud83c\udfd4\ufe0f',t:'Impar\u00e1vel',d:'Ofensiva de 30 dias',ok:g.best>=30},{ic:'\ud83d\udcaf',t:'Centuri\u00e3o',d:'100 XP no total',ok:g.xp>=100},{ic:'\ud83d\ude80',t:'Maratonista',d:'1000 XP no total',ok:g.xp>=1000},{ic:'\ud83c\udf93',t:'Analista J\u00fanior',d:'Chegar ao n\u00edvel 5',ok:lv.lvl>=5},{ic:'\ud83c\udfc6',t:'Semana cheia',d:'Bater a meta semanal',ok:(g.weekBadges||0)>=1}];
+  const badgeH=badges.map(b=>'<div class="gm-badge'+(b.ok?'':' lock')+'"><span class="ic">'+b.ic+'</span><div><b>'+b.t+'</b><span>'+b.d+'</span></div></div>').join('');
+  const body='<div class="gm-hero"><div class="gm-flame '+(on?'on':'')+'">'+flameSVG+'<span class="gm-flame-n">'+g.streak+'</span></div><div class="gm-hero-txt"><b>'+g.streak+' dia'+(g.streak===1?'':'s')+' de ofensiva</b><span>Recorde: '+g.best+' dias \u00b7 '+risk+'</span></div></div>'
+    +'<div class="gm-rings"><div class="gm-ring" style="--p:'+dpct+';--rc:var(--orange)"><div class="gm-ring-c"><div class="gm-ring-in"><b>'+dxp+'</b><span>de '+DAILY_GOAL+' XP</span></div></div><div class="gm-ring-lb">Meta di\u00e1ria</div></div><div class="gm-ring" style="--p:'+wpct+';--rc:var(--accent)"><div class="gm-ring-c"><div class="gm-ring-in"><b>'+wxp+'</b><span>de '+WEEK_GOAL+' XP</span></div></div><div class="gm-ring-lb">XP da semana</div></div></div>'
+    +'<div class="gm-level"><div class="gm-lv-top"><span class="gm-lv-badge">Nv '+lv.lvl+'</span><div><b>'+gamTitle(lv.lvl)+'</b><span>'+g.xp+' XP acumulados</span></div></div><div class="gm-bar"><i style="width:'+lvpct+'%"></i></div><span class="gm-lv-next">Faltam '+Math.max(0,lv.need-lv.into)+' XP para o n\u00edvel '+(lv.lvl+1)+'</span></div>'
+    +'<p class="gm-sub">Sua semana</p><div class="gm-week">'+week+'</div>'
+    +'<div class="gm-perks"><span class="gm-perk">\ud83d\udee1\ufe0f '+(g.freezes||0)+' prote\u00e7\u00e3o'+((g.freezes||0)===1?'':'es')+' de ofensiva</span><span class="gm-perk">\ud83c\udfc6 '+(g.weekBadges||0)+' meta'+((g.weekBadges||0)===1?'':'s')+' semanal'+((g.weekBadges||0)===1?'':'is')+'</span></div>'
+    +'<p class="gm-sub">Conquistas</p><div class="gm-badges">'+badgeH+'</div>'
+    +'<p class="gm-legend">Ganhe XP estudando: <b>+10</b> por aula conclu\u00edda, <b>+3</b> por item de checklist, <b>+60</b> por m\u00f3dulo conclu\u00eddo e <b>+5</b> por revisar flashcards. Alcance <b>'+DAILY_GOAL+' XP</b> por dia para manter a ofensiva e <b>'+WEEK_GOAL+' XP</b> na semana para ganhar uma prote\u00e7\u00e3o.</p>';
+  stOpenModal('Progresso','Sua ofensiva de estudos',body,'');
+}
 
 /* ---------- init ---------- */
 applyPrefs();buildMenus();updTop();route();
+gamInit();updGam();{const _gc=$('#gamchip');if(_gc)_gc.onclick=openGam;}
 sbInit();
 
 </script>
