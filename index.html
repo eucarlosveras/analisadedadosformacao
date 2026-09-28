@@ -438,6 +438,31 @@ td code,th code{white-space:nowrap}
 .gm-notify{margin-top:1rem;display:inline-flex;align-items:center;gap:.4rem;font-family:var(--f-head);font-weight:600;font-size:.85rem;color:var(--ink);border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:.45rem .9rem;cursor:pointer}
 .gm-notify.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
 .gm-notify:hover{border-color:var(--accent)}
+
+/* ===== Corretor de respostas subjetivas ===== */
+.corrector{margin-top:.7rem}
+.corr-btn{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--f-head);font-weight:600;font-size:.9rem;color:var(--accent-ink);background:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:.42rem .95rem;cursor:pointer;transition:background .18s,transform .1s}
+.corr-btn:hover{background:var(--accent-2)}
+.corr-btn:active{transform:translateY(1px)}
+.corr-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.corr-res{margin-top:.85rem;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);animation:smfade .2s ease}
+.corr-top{display:flex;align-items:center;gap:.8rem;padding:.85rem 1rem;border-bottom:1px solid var(--line);background:var(--panel2)}
+.corr-score{--c:var(--accent);--p:0;width:54px;height:54px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--soft) 0)}
+.corr-score i{width:42px;height:42px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-style:normal;font-family:var(--f-head);font-weight:800;font-size:.82rem;color:var(--c)}
+.corr-verdict{font-family:var(--f-head);font-weight:700;font-size:1rem;color:var(--ink);min-width:0}
+.corr-verdict small{display:block;font-weight:400;font-size:.78rem;color:var(--muted);line-height:1.35;margin-top:.15rem}
+.corr-body{padding:.4rem 1rem .6rem}
+.corr-item{padding:.6rem 0;border-top:1px dashed var(--line)}
+.corr-item:first-child{border-top:none}
+.corr-item b{font-family:var(--f-head);font-size:.85rem;color:var(--ink)}
+.corr-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.45rem}
+.corr-chip{font-size:.72rem;border-radius:999px;padding:.16rem .55rem;border:1px solid var(--line);white-space:nowrap}
+.corr-chip.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,transparent);background:color-mix(in srgb,var(--good) 10%,transparent)}
+.corr-chip.no{color:var(--muted);background:var(--soft)}
+.corr-foot{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;padding:.7rem 1rem;border-top:1px solid var(--line);background:var(--panel2)}
+.corr-foot .lnk{font-size:.82rem;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:600;padding:0;font-family:var(--f-head)}
+.corr-foot .lnk:hover{color:var(--accent-2)}
+.corr-note{font-size:.72rem;color:var(--faint);margin:0;flex:1 1 200px;min-width:0}
 </style>
 </head>
 <body>
@@ -775,6 +800,13 @@ addEventListener('resize',setHH);setTimeout(setHH,0);if(document.fonts)document.
 window.addEventListener('hashchange',route);
 
 /* ---------- common binders ---------- */
+/* ---------- Corretor de respostas subjetivas (cobertura de conceitos) ---------- */
+const corrStop=new Set('a o e de da do das dos em no na nos nas um uma uns umas que com por para pra ao aos as os se sua seu suas seus como mais menos muito pouco cada entre sobre sem ate ja nao sim isso isto ele ela eles elas voce sao ser esta este essa esse quando onde qual quais tambem porque pois entao assim outro outra outros outras pode deve devem fazer usar usando dado dados valor valores caso casos exemplo exemplos forma parte partes cada todo toda todos todas mesmo mesma numa num pela pelo pelos pelas'.split(' '));
+const corrNorm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/<[^>]+>/g,' ').replace(/[^a-z0-9%.,]/g,' ').replace(/\s+/g,' ').trim();
+function corrKeyTerms(text){const seen={},terms=[];corrNorm(text).split(' ').forEach(w=>{w=w.replace(/^[.,]+|[.,]+$/g,'');if(w.length<4)return;if(corrStop.has(w))return;if(/^[0-9.,%]+$/.test(w)&&w.length<3)return;if(seen[w])return;seen[w]=1;terms.push(w);});terms.sort((a,b)=>((/[0-9%]/.test(b)?3:0)+Math.min(b.length,12)/12)-((/[0-9%]/.test(a)?3:0)+Math.min(a.length,12)/12));return terms.slice(0,6);}
+function buildCorrection(student,ref){const sN=corrNorm(student);let chunks=[];const re=/(\d{1,2})\s*[.)]\s+([\s\S]*?)(?=\s\d{1,2}\s*[.)]\s|$)/g;let m;while((m=re.exec(ref))){chunks.push({n:m[1],text:m[2]});}if(!chunks.length)chunks=[{n:'',text:ref}];let totK=0,totM=0;const items=[];chunks.forEach((ch,idx)=>{const terms=corrKeyTerms(ch.text);if(!terms.length)return;const found=[],missing=[];terms.forEach(t=>{const stem=t.length>5?t.slice(0,t.length-2):t;(sN.indexOf(stem)>=0?found:missing).push(t);});totK+=terms.length;totM+=found.length;items.push({label:'Quest\u00e3o '+(ch.n||String(idx+1)),pct:Math.round(found.length/terms.length*100),found:found,missing:missing});});const pct=totK?Math.round(totM/totK*100):0;let v;if(pct>=75)v={t:'Excelente',c:'var(--good)',msg:'Voc\u00ea cobriu os principais conceitos do gabarito.'};else if(pct>=50)v={t:'Bom caminho',c:'var(--accent)',msg:'Boa parte dos conceitos apareceu \u2014 revise os que faltaram.'};else if(pct>=30)v={t:'Parcial',c:'var(--orange)',msg:'V\u00e1rios conceitos-chave ficaram de fora.'};else v={t:'Incompleto',c:'var(--bad)',msg:'A resposta cobriu poucos conceitos do gabarito.'};return {pct:pct,verdict:v,items:items};}
+function corrHTML(r){let items='';r.items.forEach(it=>{const okc=it.found.map(w=>'<span class="corr-chip ok">\u2713 '+esc(w)+'</span>').join('');const noc=it.missing.map(w=>'<span class="corr-chip no">\u25cb '+esc(w)+'</span>').join('');items+='<div class="corr-item"><b>'+it.label+' \u00b7 '+it.pct+'%</b><div class="corr-chips">'+okc+noc+'</div></div>';});const v=r.verdict;return '<div class="corr-res"><div class="corr-top"><div class="corr-score" style="--c:'+v.c+';--p:'+r.pct+'"><i>'+r.pct+'%</i></div><div class="corr-verdict">'+v.t+'<small>'+v.msg+'</small></div></div><div class="corr-body">'+items+'</div><div class="corr-foot"><button class="lnk" type="button" data-openref>Ver gabarito completo \u2193</button><p class="corr-note">Corre\u00e7\u00e3o autom\u00e1tica por cobertura de conceitos-chave \u2014 use como guia e confira no gabarito.</p></div></div>';}
+function initCorrectors(root){const gabs=$$('.k-gabarito',root);if(!gabs.length)return;$$('.ansbox',root).forEach(box=>{let ref=null;for(const gb of gabs){if(box.compareDocumentPosition(gb)&4){ref=gb;break;}}if(!ref)return;const ta=box.querySelector('textarea[data-k]');if(!ta)return;if(box.nextElementSibling&&box.nextElementSibling.classList&&box.nextElementSibling.classList.contains('corrector'))return;const refText=Array.prototype.filter.call(ref.children,ch=>ch.tagName!=='SUMMARY').map(ch=>ch.textContent).join(' ');const wrap=document.createElement('div');wrap.className='corrector';wrap.innerHTML='<button class="corr-btn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Corrigir minha resposta</button><div class="corr-out"></div>';box.parentNode.insertBefore(wrap,box.nextSibling);const out=wrap.querySelector('.corr-out');wrap.querySelector('.corr-btn').onclick=()=>{const student=ta.value||'';if(!student.trim()){out.innerHTML='<div class="corr-res"><div class="corr-body"><p class="corr-note" style="color:var(--muted);padding:.4rem 0">Escreva sua resposta na caixa acima antes de corrigir.</p></div></div>';return;}const r=buildCorrection(student,refText);out.innerHTML=corrHTML(r);const lnk=out.querySelector('[data-openref]');if(lnk)lnk.onclick=()=>{ref.open=true;ref.scrollIntoView({behavior:'smooth',block:'center'});};if(typeof gamAward==='function')gamAward('corr:'+ta.dataset.k+':'+todayStr(),5,'Exerc\u00edcio revisado');};});}
 function bindCommon(root,uid){
   $$('textarea[data-k]',root).forEach(t=>t.addEventListener('input',()=>{S.ans[t.dataset.k]=t.value;save();const s=root.querySelector(`[data-s="${t.dataset.k}"]`);if(s)s.textContent='Salvo neste navegador';}));
   $$('input[data-ck]',root).forEach(c=>c.addEventListener('change',()=>{S.chk[c.dataset.ck]=c.checked;save();if(c.checked)gamAward('ck:'+c.dataset.ck,3,'Item concluído');}));
@@ -783,7 +815,7 @@ function bindCommon(root,uid){
     const ok=()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar',1500);};
     if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>fallbackCopy(t,ok));else fallbackCopy(t,ok);}));
   $$('figure.img',root).forEach(f=>f.addEventListener('click',()=>{const lb=$('#lightbox');lb.querySelector('img').src=f.querySelector('img').src;lb.style.display='flex';}));
-  highlight(root);typeset(root);
+  initCorrectors(root);highlight(root);typeset(root);
 }
 function fallbackCopy(t,ok){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy');ok();}catch(e){toast('Não foi possível copiar');}x.remove();}
 $('#lightbox').addEventListener('click',()=>$('#lightbox').style.display='none');
