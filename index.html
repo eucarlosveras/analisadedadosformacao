@@ -463,6 +463,29 @@ td code,th code{white-space:nowrap}
 .corr-foot .lnk{font-size:.82rem;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:600;padding:0;font-family:var(--f-head)}
 .corr-foot .lnk:hover{color:var(--accent-2)}
 .corr-note{font-size:.72rem;color:var(--faint);margin:0;flex:1 1 200px;min-width:0}
+
+/* ===== Quiz de multipla escolha ===== */
+.qz-wrap{--fcaccent:var(--accent)}
+.qz-count{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);margin:.25rem 0 .7rem}
+.qz-stem{font-family:var(--f-head);font-weight:700;font-size:1.18rem;line-height:1.4;color:var(--ink);margin-bottom:1rem}
+.qz-opts{display:flex;flex-direction:column;gap:.6rem}
+.qz-opt{display:flex;align-items:flex-start;gap:.7rem;text-align:left;width:100%;padding:.72rem .9rem;border:1.5px solid var(--line);border-radius:12px;background:var(--panel);cursor:pointer;font-size:.98rem;line-height:1.45;color:var(--ink);transition:border-color .15s,background .15s,transform .08s}
+.qz-opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim)}
+.qz-opt:active:not(:disabled){transform:scale(.995)}
+.qz-opt:disabled{cursor:default}
+.qz-key{flex:none;width:26px;height:26px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--f-head);font-weight:700;font-size:.85rem;color:var(--muted)}
+.qz-txt{padding-top:.15rem}
+.qz-opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.qz-opt.ok .qz-key{background:var(--good);border-color:var(--good);color:#fff}
+.qz-opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.qz-opt.bad .qz-key{background:var(--bad);border-color:var(--bad);color:#fff}
+.qz-score{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.qz-result{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.55rem;padding:1.4rem 1rem}
+.qz-rscore{--c:var(--accent);--p:0;width:98px;height:98px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--soft) 0);margin-bottom:.3rem}
+.qz-rscore i{width:78px;height:78px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-style:normal;font-family:var(--f-head);font-weight:800;font-size:1.35rem;color:var(--c)}
+.qz-result b{font-family:var(--f-head);font-size:1.35rem;color:var(--ink)}
+.qz-result>span{color:var(--muted);font-size:.9rem}
+.qz-ractions{margin-top:.7rem}
 </style>
 </head>
 <body>
@@ -1067,6 +1090,7 @@ function renderLesson(uid,sid){
       <div class="study-tools" role="group" aria-label="Ferramentas de estudo desta aula">
         <span class="stt">Estude esta aula</span>
         <button type="button" class="stbtn" data-study="flash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="14" height="12" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/></svg><span>Gerar flashcards</span></button>
+        <button type="button" class="stbtn ghost" data-study="quiz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.4 6 5.3 6.9 7 5.2M4.4 12l.9.9L7 11.2"/><circle cx="5.2" cy="18" r="1.3"/></svg><span>Fazer quiz</span></button>
         <button type="button" class="stbtn ghost" data-study="map"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M7.1 11 16 6.6M7.1 13l8.9 4.4"/></svg><span>Gerar mapa mental</span></button>
       </div>
       ${R(sl.blocks,uid)}
@@ -1342,7 +1366,23 @@ function openMindmap(uid,sid){
   w.querySelector('[data-mm="zout"]').onclick=()=>{zoom=Math.max(0.5,zoom-0.2);applyZoom();};
   w.querySelector('[data-mm="dl"]').onclick=()=>{const s=new XMLSerializer().serializeToString(svgEl);dl('mapa-mental-'+sid+'.svg','<?xml version="1.0" encoding="UTF-8"?>\n'+s,'image/svg+xml');toast('Mapa mental exportado');};
 }
-function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{if(b.dataset.study==='flash'){gamAward('fc:'+sid+':'+todayStr(),5,'Revisão de flashcards');openFlashcards(uid,sid);}else openMindmap(uid,sid);};});}
+function qShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const r=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[r];a[r]=t;}return a;}
+function quizBuild(uid,sid){const d=studyData(uid,sid);const seen=new Set();const pool=[];d.cards.forEach(c=>{if(!c.q||!c.a)return;const k=c.a.toLowerCase().slice(0,45);if(seen.has(k))return;seen.add(k);pool.push(c);});if(pool.length<4)return {title:d.title,color:d.color,questions:[]};const answers=pool.map(c=>c.a);const N=Math.min(10,pool.length);const picked=qShuffle(pool.map((c,i)=>i)).slice(0,N);const clip=a=>a.length>160?a.slice(0,159).replace(/\s+\S*$/,'')+'\u2026':a;const questions=picked.map(i=>{const c=pool[i];const distr=qShuffle(answers.filter((a,ai)=>ai!==i&&a!==c.a)).slice(0,3);const opts=qShuffle([c.a].concat(distr)).map(a=>({text:clip(a),correct:a===c.a}));return {stem:c.q,type:c.type,options:opts};});return {title:d.title,color:d.color,questions:questions};}
+function openQuiz(uid,sid){const q=quizBuild(uid,sid);if(q.questions.length<3){stOpenModal('Quiz',q.title,'<p class="sub">Esta aula ainda n\u00e3o gera perguntas de m\u00faltipla escolha suficientes. Experimente os flashcards ou o mapa mental.</p>','');return;}
+  let i=0,score=0,answered=false;
+  const body='<div class="qz-wrap" id="qzwrap"><div class="fc-progress"><span class="fc-bar" id="qzbar"></span></div><div class="qz-count" id="qzcount"></div><div class="qz-stem" id="qzstem"></div><div class="qz-opts" id="qzopts"></div></div>';
+  const foot='<span class="qz-score" id="qzscore"></span><button class="stbtn" id="qznext" type="button" style="margin-left:auto" disabled>Pr\u00f3xima</button>';
+  const w=stOpenModal('Quiz',q.title,body,foot);
+  const wrap=$('#qzwrap',w),bar=$('#qzbar',w),cnt=$('#qzcount',w),stem=$('#qzstem',w),optsEl=$('#qzopts',w),nextBtn=$('#qznext',w),scoreEl=$('#qzscore',w);
+  wrap.style.setProperty('--fcaccent',q.color||cssVar('--accent'));
+  function render(){answered=false;const cur=q.questions[i];bar.style.width=(i/q.questions.length*100)+'%';cnt.textContent='Pergunta '+(i+1)+' de '+q.questions.length;stem.textContent=cur.stem;optsEl.innerHTML='';cur.options.forEach((o,oi)=>{const btn=document.createElement('button');btn.className='qz-opt';btn.type='button';btn.innerHTML='<span class="qz-key">'+String.fromCharCode(65+oi)+'</span><span class="qz-txt">'+esc(o.text)+'</span>';btn.onclick=()=>choose(oi,btn);optsEl.appendChild(btn);});nextBtn.disabled=true;nextBtn.textContent=(i===q.questions.length-1)?'Ver resultado':'Pr\u00f3xima';scoreEl.textContent='Acertos: '+score+'/'+q.questions.length;}
+  function choose(oi,btn){if(answered)return;answered=true;const cur=q.questions[i];const btns=$$('.qz-opt',optsEl);btns.forEach((b,bi)=>{b.disabled=true;if(cur.options[bi].correct)b.classList.add('ok');});if(cur.options[oi].correct)score++;else btn.classList.add('bad');scoreEl.textContent='Acertos: '+score+'/'+q.questions.length;nextBtn.disabled=false;}
+  function finish(){const pct=Math.round(score/q.questions.length*100);let vt,vc;if(pct>=80){vt='Excelente!';vc='var(--good)';}else if(pct>=60){vt='Bom trabalho!';vc='var(--accent)';}else if(pct>=40){vt='D\u00e1 para melhorar';vc='var(--orange)';}else{vt='Vale revisar a aula';vc='var(--bad)';}wrap.innerHTML='<div class="qz-result"><div class="qz-rscore" style="--c:'+vc+';--p:'+pct+'"><i>'+pct+'%</i></div><b>'+vt+'</b><span>Voc\u00ea acertou '+score+' de '+q.questions.length+' perguntas.</span><div class="qz-ractions"><button class="stbtn" id="qzredo" type="button">\u21bb Refazer quiz</button></div></div>';nextBtn.style.display='none';scoreEl.textContent='';const rd=$('#qzredo',w);if(rd)rd.onclick=()=>openQuiz(uid,sid);if(typeof gamAward==='function')gamAward('quiz:'+sid+':'+todayStr(),3+score*2,'Quiz conclu\u00eddo');}
+  nextBtn.onclick=()=>{if(!answered)return;if(i<q.questions.length-1){i++;render();}else finish();};
+  render();
+  ST_KEYHANDLER=e=>{if(!answered){const n=parseInt(e.key,10);const opts=q.questions[i].options;if(n>=1&&n<=opts.length){const btns=$$('.qz-opt',optsEl);choose(n-1,btns[n-1]);}}else if(e.key==='Enter'){nextBtn.click();}};
+}
+function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{const k=b.dataset.study;if(k==='flash'){gamAward('fc:'+sid+':'+todayStr(),5,'Revisão de flashcards');openFlashcards(uid,sid);}else if(k==='quiz'){openQuiz(uid,sid);}else openMindmap(uid,sid);};});const _qb=V.querySelector('[data-study="quiz"]');if(_qb){try{if(quizBuild(uid,sid).questions.length<3)_qb.style.display='none';}catch(e){}}}
 
 /* ---------- Gamificacao: ofensiva (streak), XP, niveis, XP semanal ---------- */
 const DAILY_GOAL=30,WEEK_GOAL=200;
