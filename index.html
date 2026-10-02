@@ -500,6 +500,15 @@ td code,th code{white-space:nowrap}
 .vid-add input{flex:1 1 240px;min-width:0;padding:.55rem .8rem;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:.95rem;font-family:inherit}
 .vid-add input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .vid-hint{font-size:.75rem;color:var(--faint);margin:.55rem 0 0}
+.attach{margin-top:1.8rem;border-top:1px solid var(--line);padding-top:1.3rem}
+.attach-list{display:flex;flex-direction:column;gap:.5rem;margin:.6rem 0 1rem}
+.attach-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.attach-item a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.attach-meta{font-size:.78rem;color:var(--faint);flex:none}
+.attach-rm{flex:none;width:28px;height:28px;border:none;border-radius:8px;background:var(--soft);color:var(--muted);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center}
+.attach-rm:hover{background:var(--bad);color:#fff}
+.attach-empty{color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:12px;padding:1.1rem;text-align:center}
+.attach-add{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .vid-empty{grid-column:1/-1;color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:12px;padding:1.3rem;text-align:center}
 
 /* videos curados (recomendados do modulo) */
@@ -1133,6 +1142,13 @@ function renderLesson(uid,sid){
         <div class="vid-add"><input type="url" id="vidinput" inputmode="url" placeholder="Cole um link do YouTube — youtube.com/watch?v=… ou youtu.be/…"><button class="btn primary" id="vidadd" type="button">Adicionar vídeo</button></div>
         <p class="vid-hint">Os vídeos ficam salvos neste navegador e no seu backup (exportação).</p>
       </section>
+      <section class="attach" id="attach" aria-label="Material complementar">
+        <h2 class="sec"><span class="hn2 nb">📎</span><span>Material complementar</span></h2>
+        <p class="sub">Anexe PDFs, prints, áudios ou qualquer arquivo de outra plataforma que complemente esta aula.</p>
+        <div id="attachList" class="attach-list"><p class="sub">Carregando…</p></div>
+        <div class="attach-add"><label class="btn" id="attachLabel" for="attachInput" style="cursor:pointer">Anexar arquivo</label><input type="file" id="attachInput" multiple class="sr"></div>
+        <p class="vid-hint">Limite de 25 MB por arquivo. Fica guardado na sua conta da nuvem — vincule um e-mail para acessar de outros aparelhos.</p>
+      </section>
       <nav class="lp-nav">${prevHref?`<a class="navbtn" href="${prevHref}">← ${prevLabel}</a>`:'<span></span>'}${nextHref?`<a class="navbtn next" href="${nextHref}">${nextLabel} →</a>`:''}</nav>
     </div>
     <aside class="lp-side">
@@ -1144,6 +1160,7 @@ function renderLesson(uid,sid){
   applyHL(sid);
   bindStudyTools(uid,sid);
   initVideos(uid,sid);
+  initAttach(uid,sid);
 }
 
 /* ---------- highlights ---------- */
@@ -1429,6 +1446,46 @@ function initVideos(uid,sid){
   if(cur){var v=(VID_CUR[sid]||[])[0],rel=false;if(!v){var curN=parseInt((sid.split('-s')[1]||'0'),10);var best=null,bd=1e9;for(var k in VID_CUR){if(k.indexOf(uid+'-s')===0){var n=parseInt(k.split('-s')[1],10);var d=Math.abs(n-curN);if(d<bd){bd=d;best=k;}}}if(best){v=VID_CUR[best][0];rel=true;}}cur.innerHTML=v?('<div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.t)+'" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="vid-cap"><b>'+esc(v.t)+'</b><span>'+(rel?'Relacionado':'Recomendado')+' · '+esc(v.a)+'</span></div></div>'):'';}
   const render=()=>{const list=S.vid[sid]||[];if(!list.length){grid.innerHTML='<div class="vid-empty">Você ainda não salvou vídeos aqui. Cole um link do YouTube abaixo.</div>';return;}grid.innerHTML=list.map(id=>'<div class="vid-item"><div class="vid-frame"><iframe src="https://www.youtube-nocookie.com/embed/'+id+'" title="Vídeo do YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><button class="vid-rm" type="button" data-id="'+id+'" aria-label="Remover vídeo">✕</button></div>').join('');$$('.vid-rm',grid).forEach(b=>b.onclick=()=>{S.vid[sid]=(S.vid[sid]||[]).filter(x=>x!==b.dataset.id);if(!S.vid[sid].length)delete S.vid[sid];save();render();});};
   const input=$('#vidinput'),addBtn=$('#vidadd');const add=()=>{if(!input)return;const id=ytId(input.value);if(!id){toast('Link do YouTube inválido');return;}S.vid[sid]=S.vid[sid]||[];if(S.vid[sid].indexOf(id)>=0){toast('Esse vídeo já foi adicionado');input.value='';return;}S.vid[sid].push(id);save();input.value='';render();toast('Vídeo adicionado');if(typeof gamAward==='function')gamAward('vid:'+sid+':'+todayStr(),3,'Vídeo adicionado');};if(addBtn)addBtn.onclick=add;if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}});
+  render();
+}
+function fmtBytes(n){if(!n)return '';if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(0)+' KB';return (n/1048576).toFixed(1)+' MB';}
+const ATTACH_MAX=26214400;
+async function initAttach(uid,sid){
+  const box=$('#attach');if(!box)return;
+  const list=$('#attachList',box),input=$('#attachInput',box),label=$('#attachLabel',box);
+  if(!sb||!sbUser){if(list)list.innerHTML='<p class="sub">Anexos exigem sincronização com a nuvem ativa — abra "Backup e exportação" para conectar.</p>';if(input)input.disabled=true;if(label)label.style.display='none';return;}
+  const ownerId=sbUser.id;
+  async function render(){
+    list.innerHTML='<p class="sub">Carregando…</p>';
+    const {data,error}=await sb.from('study_attachments').select('*').eq('user_id',ownerId).eq('section_id',sid).order('created_at',{ascending:false});
+    if(error){list.innerHTML='<p class="sub">Não foi possível carregar os anexos agora.</p>';return;}
+    if(!data||!data.length){list.innerHTML='<div class="attach-empty">Nenhum anexo ainda. Envie um PDF, print, áudio ou qualquer arquivo de outra plataforma que complemente esta aula.</div>';return;}
+    const rows=await Promise.all(data.map(async r=>{
+      const {data:signed}=await sb.storage.from('study-attachments').createSignedUrl(r.storage_path,3600);
+      return Object.assign({},r,{url:signed&&signed.signedUrl});
+    }));
+    list.innerHTML=rows.map(r=>`<div class="attach-item"><a href="${r.url||'#'}" target="_blank" rel="noopener">${esc(r.file_name)}</a><span class="attach-meta">${fmtBytes(r.size_bytes)}</span><button type="button" class="attach-rm" data-id="${r.id}" data-path="${esc(r.storage_path)}" aria-label="Remover anexo">✕</button></div>`).join('');
+    $$('.attach-rm',list).forEach(b=>b.onclick=async()=>{
+      b.disabled=true;
+      await sb.storage.from('study-attachments').remove([b.dataset.path]);
+      await sb.from('study_attachments').delete().eq('id',b.dataset.id);
+      render();
+    });
+  }
+  if(input)input.onchange=async()=>{
+    const files=Array.from(input.files||[]);if(!files.length)return;
+    for(const f of files){
+      if(f.size>ATTACH_MAX){toast('Arquivo maior que 25 MB: '+f.name);continue;}
+      const safe=f.name.replace(/[^\w.\-]+/g,'_');
+      const path=`${ownerId}/${sid}/${Date.now()}_${safe}`;
+      const {error:upErr}=await sb.storage.from('study-attachments').upload(path,f);
+      if(upErr){toast('Falha ao enviar '+f.name);continue;}
+      await sb.from('study_attachments').insert({user_id:ownerId,section_id:sid,unit_id:uid,file_name:f.name,storage_path:path,mime_type:f.type||null,size_bytes:f.size});
+    }
+    input.value='';
+    toast('Anexo(s) enviado(s)');
+    render();
+  };
   render();
 }
 function bindStudyTools(uid,sid){$$('[data-study]',V).forEach(b=>{b.onclick=()=>{const k=b.dataset.study;if(k==='flash'){gamAward('fc:'+sid+':'+todayStr(),5,'Revisão de flashcards');openFlashcards(uid,sid);}else if(k==='quiz'){openQuiz(uid,sid);}else openMindmap(uid,sid);};});const _qb=V.querySelector('[data-study="quiz"]');if(_qb){try{if(quizBuild(uid,sid).questions.length<3)_qb.style.display='none';}catch(e){}}}
