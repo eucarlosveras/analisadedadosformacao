@@ -744,7 +744,7 @@ function groupByTier(secs){
 const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10','m16'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
-const CHUNK_SIZE=4;
+const CHUNK_SIZE=1;
 const LESSONS=(()=>{
   const perMod=MOD_ORDER.map(mid=>{const m=byId[mid];return m?{mod:m,secs:m.secs}:null;}).filter(Boolean);
   const out=[];
@@ -753,7 +753,7 @@ const LESSONS=(()=>{
     perMod.forEach(p=>{
       const lessons=p.secs.slice(round,round+CHUNK_SIZE);
       if(!lessons.length)return;
-      const hasCheck=round+CHUNK_SIZE<p.secs.length;
+      const hasCheck=false;
       out.push({mod:p.mod,lessons,idx:round/CHUNK_SIZE+1,hasCheck});
     });
   }
@@ -1015,7 +1015,7 @@ function renderHome(){
       const state=isDone?'done':isCur?'cur':'';
       const first=l.lessons[0];
       const name=esc(first.t);
-      const meta=`Bloco ${l.idx} · ${esc(l.mod.short)} · ${l.lessons.length} aula${l.lessons.length>1?'s':''}${l.hasCheck?' + prática':''}`;
+      const meta=`${esc(l.mod.short)} · aula ${l.idx}`;
       const href=isCur?blockHref(l):`#/u/${l.mod.id}/${first.id}`;
       let right;
       if(isDone)right='<span class="pill">concluído</span>';
@@ -1142,7 +1142,7 @@ function renderLesson(uid,sid){
   const sl=lessonBlocks(u,sid);
   CALLN=countCallsBefore(u.blocks,sl.idx);CK=countChkItemsBefore(u.blocks,sl.idx);
   const si=u.secs.findIndex(s=>s.id===sid);
-  const chunked=MOD_ORDER.includes(uid);
+  const chunked=false;
   const blockIdx=Math.floor(si/CHUNK_SIZE)+1;
   const blockStart=(blockIdx-1)*CHUNK_SIZE;
   const blockEnd=Math.min(blockStart+CHUNK_SIZE,u.secs.length);
