@@ -554,6 +554,21 @@ td code,th code{white-space:nowrap}
 .diff-mark.d2{background:#d97706}
 .diff-mark.d3{background:#dc2626}
 </style>
+<style>
+.bloom-tag{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);background:var(--soft);padding:.05rem .4rem;border-radius:999px;vertical-align:middle;margin-left:.45rem}
+.facet-hl{background:var(--soft);border-radius:8px;box-shadow:0 0 0 .4rem var(--soft)}
+.esp-volta{margin:1.4rem 0;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:14px;background:var(--card,rgba(128,128,128,.04))}
+.esp-head{display:flex;align-items:center;gap:.7rem}
+.esp-num{flex:0 0 auto;width:2rem;height:2rem;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.esp-nome{font-weight:700;font-size:1.05rem}
+.esp-bloom{font-size:.8rem;opacity:.7}
+.esp-mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;margin-top:.8rem}
+.esp-mod{display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;border:1px solid var(--line);border-radius:10px;color:inherit;text-decoration:none;transition:.15s}
+.esp-mod:hover{border-color:var(--accent);transform:translateY(-1px)}
+.esp-badge{flex:0 0 auto;min-width:1.4rem;height:1.4rem;padding:0 .2rem;border-radius:6px;color:#fff;font-weight:700;font-size:.72rem;display:flex;align-items:center;justify-content:center}
+.esp-modname{font-size:.82rem;font-weight:600;line-height:1.12}
+.esp-modname small{display:block;font-weight:500;opacity:.6;font-size:.72rem}
+</style>
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
@@ -799,7 +814,7 @@ $('#fontbtn').onclick=()=>{S.fs=S.fs>=19?16:S.fs+1;applyPrefs();save();toast('Fo
 $('#focusbtn').onclick=()=>{S.focus=!S.focus;applyPrefs();save();toast(S.focus?'Modo foco ativado':'Modo foco desativado');};
 
 /* ---------- menus ---------- */
-const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona a trilha'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/revisar','Para revisar'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
+const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona a trilha'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/revisar','Para revisar'],['#/espiral','Trilha em espiral'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
 function buildMenus(){
   let h='<div class="parts">'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</div><hr style="border:0;border-top:1px solid var(--line)">';
   h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--dotc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}</a></li>`).join('')).join('')+'</ol></details>').join('');
@@ -865,7 +880,7 @@ function rb(b,uid){
   switch(b.t){
     case 'h1':return '';
     case 'h2':return `<h2 class="sec" id="${b.sid}"><span class="hn2${b.n?'':' nb'}">${b.n?esc(b.n):'¶'}</span><span>${b.h}</span><label class="secchk" title="Marque quando terminar esta aula"><input type="checkbox" data-sec="${b.sid}" ${S.sec[b.sid]?'checked':''}> concluída</label></h2>`;
-    case 'h3':return `<h3>${b.h}</h3>`;
+    case 'h3':return `<h3>${b.h}${bloomTag(b.h)}</h3>`;
     case 'p':return `<p>${b.h}</p>`;
     case 'ul':case 'ol':return renderList(b);
     case 'chk':return '<div class="chk">'+b.items.map(it=>{const k=uid+'-c'+(CK++);return `<label><input type="checkbox" data-ck="${k}" ${S.chk[k]?'checked':''}><span>${it.h}</span></label>`;}).join('')+'</div>';
@@ -886,13 +901,39 @@ function rb(b,uid){
 }
 
 /* ---------- router ---------- */
+const BLOOM_FACETS={'O que é?':'Lembrar','Por que importa?':'Entender','De onde veio?':'Entender','Como funciona?':'Aplicar','Como aplicar?':'Aplicar','Exemplos práticos':'Aplicar','Exemplos e visão crítica':'Analisar · Avaliar','Como interpretar e onde falha?':'Analisar · Avaliar','Onde falha ou não se aplica?':'Analisar · Avaliar','O que estudar em seguida?':'Criar'};
+function _striptxt(h){return (h||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();}
+function bloomTag(h){const t=_striptxt(h);for(const q in BLOOM_FACETS){if(t.indexOf(q)===0)return ' <span class="bloom-tag">'+BLOOM_FACETS[q]+'</span>';}return '';}
+const VOLTAS=[
+ {k:'entender',nome:'Lembrar & Entender',bloom:'Lembrar · Entender',desc:'Primeira passagem pela trilha inteira: veja <strong>o que é</strong> e <strong>por que importa</strong> cada assunto de todos os módulos. Visão panorâmica, sem se afogar em detalhes.',qs:['O que é?','Por que importa?','De onde veio?']},
+ {k:'aplicar',nome:'Aplicar',bloom:'Aplicar',desc:'Segunda passagem: volte aos mesmos temas e foque em <strong>como funciona</strong> e nos <strong>exemplos práticos</strong>.',qs:['Como funciona?','Como aplicar?','Exemplos práticos']},
+ {k:'avaliar',nome:'Analisar & Avaliar',bloom:'Analisar · Avaliar',desc:'Terceira passagem: reexamine cada tema pela <strong>visão crítica</strong> — onde falha, quando não se aplica e quais os limites.',qs:['Onde falha ou não se aplica?','Como interpretar e onde falha?','Exemplos e visão crítica']},
+ {k:'criar',nome:'Criar',bloom:'Criar',desc:'Quarta passagem: consolide <strong>criando</strong> — exercícios, mini-projetos e o que estudar em seguida de cada módulo.',qs:['O que estudar em seguida?']}
+];
+function voltaByKey(k){return VOLTAS.find(v=>v.k===k);}
+function scrollToFacet(k){const v=voltaByKey(k);if(!v)return;const hs=$$('#art h3');for(const el of hs){const t=el.textContent.trim();if(v.qs.some(q=>t.indexOf(q)===0)){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.add('facet-hl');setTimeout(function(){el.classList.remove('facet-hl');},2200);return;}}}
+function renderEspiral(){
+  const order=MOD_ORDER.map(id=>byId[id]).filter(Boolean).sort((a,b)=>a.num-b.num);
+  const voltasHTML=VOLTAS.map(function(v,i){
+    const mods=order.map(function(u){
+      const prac=v.k==='criar';
+      const s=u.secs.find(function(x){const t4=sectionTier(x.t)===4;return prac?t4:!t4;})||u.secs[0];
+      const sid=s?s.id:(u.secs[0]&&u.secs[0].id);
+      const c=MC[u.id]||'var(--accent)';
+      const k=secDone(u),n=u.secs.length,pct=n?Math.round(k/n*100):0;
+      return '<a class="esp-mod" href="#/u/'+u.id+'/'+sid+'/'+v.k+'"><span class="esp-badge" style="background:'+c+'">'+u.num+'</span><span class="esp-modname">'+esc(u.title)+'<small>'+pct+'%</small></span></a>';
+    }).join('');
+    return '<section class="esp-volta"><div class="esp-head"><span class="esp-num">'+(i+1)+'</span><div><div class="esp-nome">Volta '+(i+1)+' · '+esc(v.nome)+'</div><div class="esp-bloom">Nível de Bloom: '+esc(v.bloom)+'</div></div></div><p class="sub">'+v.desc+'</p><div class="esp-mods">'+mods+'</div></section>';
+  }).join('');
+  V.innerHTML='<div class="sheet"><p class="crumb"><a href="#/inicio">Trilha</a> › Trilha em espiral</p><h1>Trilha em espiral</h1><p class="sub" style="max-width:64ch">Método do <strong>currículo em espiral</strong> (Jerome Bruner) combinado com a <strong>Taxonomia de Bloom</strong>: em vez de esgotar um módulo e nunca mais voltar, você percorre os mesmos temas em <strong>quatro voltas</strong>, cada uma exigindo um nível de pensamento mais alto. Cada link abre a aula já na parte daquela volta.</p>'+voltasHTML+'</div>';
+}
 function route(){
   hideTool();
   const h=location.hash||'#/inicio';const p=h.slice(2).split('/');
   let target=null,uid=null;
-if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s=>s.id===target))renderLesson(uid,target);else renderCourse(uid);}
+if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s=>s.id===target))renderLesson(uid,target,p[3]);else renderCourse(uid);}
   else if(p[0]==='check'&&byId[p[1]]){uid=p[1];renderCheck(uid,parseInt(p[2],10)||1);}
-  else if(p[0]==='revisar')renderRevisar();else if(p[0]==='guia')renderGuia();else if(p[0]==='painel')renderPainel();
+  else if(p[0]==='revisar')renderRevisar();else if(p[0]==='espiral')renderEspiral();else if(p[0]==='guia')renderGuia();else if(p[0]==='painel')renderPainel();
   else if(p[0]==='busca')renderBusca(decodeURIComponent(p[1]||''));else if(p[0]==='materiais')renderMateriais();
   else renderHome();
   markSide(uid,target);
@@ -1142,7 +1183,7 @@ function lessonBlocks(u,sid){
   for(let i=idx+1;i<u.blocks.length;i++){if(u.blocks[i].t==='h2'){end=i;break;}}
   return {blocks:u.blocks.slice(idx,end),idx};
 }
-function renderLesson(uid,sid){
+function renderLesson(uid,sid,facet){
   const u=byId[uid];S.last=uid;save();
   const sec=u.secs.find(s=>s.id===sid);
   if(!sec){renderCourse(uid);return;}
@@ -1221,6 +1262,7 @@ function renderLesson(uid,sid){
   initVideos(uid,sid);
   initAttach(uid,sid);
   initDiff(uid,sid);
+  if(facet)setTimeout(function(){scrollToFacet(facet);},80);
 }
 
 /* ---------- highlights ---------- */
