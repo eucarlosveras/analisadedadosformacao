@@ -548,6 +548,12 @@ td code,th code{white-space:nowrap}
 .modp-pct{flex:0 0 auto;font-variant-numeric:tabular-nums;opacity:.7;font-size:.85rem}
 .modp-meta{margin-top:.4rem;font-size:.78rem;opacity:.65}
 </style>
+<style>
+.diff-mark{display:inline-block;font-size:.68rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;color:#fff;white-space:nowrap;flex:0 0 auto}
+.diff-mark.d1{background:#16a34a}
+.diff-mark.d2{background:#d97706}
+.diff-mark.d3{background:#dc2626}
+</style>
 </head>
 <body>
 <a class="skip" href="#main">Pular para o conteúdo</a>
@@ -804,6 +810,7 @@ document.addEventListener('click',e=>{const m=$('#modmenu');if(m.open&&!m.contai
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modmenu').removeAttribute('open');hideTool();$('#lightbox').style.display='none';}});
 function markSide(uid,sid){}
 const DIFF_LABEL={1:'Tranquilo',2:'Deu trabalho',3:'Difícil — revisar'};
+const DIFF_MARK={1:'Revisão',2:'Médio',3:'Revisão urgente'};
 function diffMerge(remote){if(!remote||typeof remote!=='object')return;S.diff=Object.assign({},remote,S.diff||{});}
 function initDiff(uid,sid){
   const box=document.getElementById('diffbox');if(!box)return;S.diff=S.diff||{};
@@ -822,7 +829,7 @@ function renderRevisar(){
   var n3=items.filter(function(x){return x.d===3;}).length,n2=items.filter(function(x){return x.d===2;}).length,n1=items.filter(function(x){return x.d===1;}).length;
   var body;
   if(!items.length){body='<p class="sub">Você ainda não marcou nenhuma aula. Ao estudar, use “Como foi esta aula?” no fim de cada sessão para marcar o grau de dificuldade — as marcadas aparecem aqui para revisão.</p>';}
-  else{body='<p class="sub"><b>'+n3+'</b> difícil(eis) · <b>'+n2+'</b> para revisar · <b>'+n1+'</b> tranquila(s)</p><div class="lesson-list">'+items.map(function(o){return '<a class="lesson rev-item" href="#/u/'+o.u.id+'/'+o.s.id+'"><span class="ldiff d'+o.d+'" title="'+DIFF_LABEL[o.d]+'"></span><div class="lnum">'+esc(o.s.n||'')+'</div><div class="ltitle">'+esc(o.s.t)+'<small class="rev-mod">'+esc(o.u.short||o.u.title)+'</small></div></a>';}).join('')+'</div>';}
+  else{body='<p class="sub"><b>'+n3+'</b> difícil(eis) · <b>'+n2+'</b> para revisar · <b>'+n1+'</b> tranquila(s)</p><div class="lesson-list">'+items.map(function(o){return '<a class="lesson rev-item" href="#/u/'+o.u.id+'/'+o.s.id+'"><span class="diff-mark d'+o.d+'">'+DIFF_MARK[o.d]+'</span><div class="lnum">'+esc(o.s.n||'')+'</div><div class="ltitle">'+esc(o.s.t)+'<small class="rev-mod">'+esc(o.u.short||o.u.title)+'</small></div></a>';}).join('')+'</div>';}
   V.innerHTML='<div class="sheet"><p class="crumb"><a href="#/inicio">Trilha</a> › Para revisar</p><h1>Para revisar</h1><p class="sub" style="max-width:56ch">Suas aulas marcadas por dificuldade, das mais difíceis para as mais tranquilas. Clique para reabrir.</p>'+body+'</div>';
 }
 function updTop(){const all=allSecs();const d=all.filter(s=>S.sec[s.id]).length;$('#progtop').style.width=(all.length?d/all.length*100:0)+'%';}
@@ -1118,7 +1125,7 @@ function renderCourse(uid){
     <div><h1>${esc(u.title)}</h1>${blurb?`<p class="sub" style="margin-top:.5rem;max-width:52ch">${esc(blurb)}</p>`:''}</div>
     ${n>1?`<div class="ring"><svg width="70" height="70"><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg><div class="ring-txt"><b>${k}/${n}</b><span>AULAS</span></div></div>`:''}
   </div>
-  ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}</div>${S.diff&&S.diff[s.id]?`<span class="ldiff d${S.diff[s.id]}" title="${DIFF_LABEL[S.diff[s.id]]}" style="margin-left:auto"></span>`:''}</a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
+  ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}</div>${S.diff&&S.diff[s.id]?`<span class="diff-mark d${S.diff[s.id]}" style="margin-left:auto">${DIFF_MARK[S.diff[s.id]]}</span>`:''}</a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
   <div class="meta" style="margin-top:1.4rem">${u.kind==='mod'||uid==='projetos'?`<button class="btn ${dd?'':'primary'}" id="donebtn" aria-pressed="${!!dd}">${dd?'✔ Concluído em '+fmtD(dd):'Marcar módulo como concluído'}</button>`:''}<button class="btn" id="bmbtn" aria-pressed="${!!S.bm[uid]}">${S.bm[uid]?'★ Nos favoritos':'☆ Favoritar'}</button></div>
   ${curVideoHTML(uid)}
   <h2 id="notas"><span class="hn2 nb">✎</span><span>Minhas anotações</span></h2>
