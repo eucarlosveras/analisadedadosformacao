@@ -604,6 +604,39 @@ td code,th code{white-space:nowrap}
 </style>
 </head>
 <body>
+<style>
+#authgate{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0d2e55,#234E82);overflow:auto}
+#authgate.hidden{display:none}
+body.authlock{overflow:hidden}
+#authgate .acard{width:100%;max-width:392px;background:#fff;color:#1b2430;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:28px 26px;font-family:inherit}
+#authgate .alogo{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+#authgate .alogo .lg{width:42px;height:42px;flex:0 0 auto;border-radius:11px;background:#234E82;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;letter-spacing:.5px}
+#authgate h2{margin:0;font-size:18px;line-height:1.25;color:#0d2e55}
+#authgate .asub{margin:4px 0 18px;font-size:13px;color:#5a6b7f;line-height:1.45}
+#authgate .atabs{display:flex;gap:6px;background:#eef2f7;border-radius:10px;padding:4px;margin-bottom:6px}
+#authgate .atabs button{flex:1;border:0;background:transparent;padding:9px;border-radius:7px;font-size:14px;font-weight:600;color:#5a6b7f;cursor:pointer}
+#authgate .atabs button.on{background:#fff;color:#0d2e55;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#authgate label{display:block;font-size:12.5px;font-weight:600;color:#3a4756;margin:13px 0 5px}
+#authgate input{width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid #d4dce6;border-radius:9px;font-size:15px;color:#1b2430;background:#fff}
+#authgate input:focus{outline:none;border-color:#234E82;box-shadow:0 0 0 3px rgba(35,78,130,.15)}
+#authgate .asubmit{width:100%;margin-top:18px;padding:12px;border:0;border-radius:9px;background:#234E82;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+#authgate .asubmit:hover{background:#1c3f6b}
+#authgate .amsg{margin:12px 0 0;font-size:13px;color:#b5563a;min-height:18px;text-align:center;line-height:1.4}
+#authgate .afoot{margin:16px 0 0;font-size:11.5px;color:#8a97a6;text-align:center;line-height:1.5}
+</style>
+<div id="authgate">
+  <form class="acard" id="authform" autocomplete="on" onsubmit="return false">
+    <div class="alogo"><span class="lg">AD</span><div><h2>Do Zero ao Melhor Analista de Dados</h2></div></div>
+    <p class="asub">Entre na sua conta para acessar a trilha de estudos. Seu progresso fica salvo no seu perfil.</p>
+    <div class="atabs"><button type="button" id="authtab-in" class="on">Entrar</button><button type="button" id="authtab-up">Criar conta</button></div>
+    <div id="authname-row" style="display:none"><label for="authnameinput">Nome</label><input id="authnameinput" type="text" autocomplete="name" placeholder="Como quer ser chamado"></div>
+    <label for="authemail">E-mail</label><input id="authemail" type="email" autocomplete="email" placeholder="seu@email.com" required>
+    <label for="authpw">Senha</label><input id="authpw" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" required>
+    <button type="submit" class="asubmit" id="authsubmit">Entrar</button>
+    <p class="amsg" id="authmsg"></p>
+    <p class="afoot">Seu progresso de estudos fica salvo com segurança no seu perfil e sincroniza entre aparelhos.</p>
+  </form>
+</div>
 <a class="skip" href="#main">Pular para o conteúdo</a>
 <header class="top" role="banner">
   <div class="ribbon">
@@ -653,25 +686,81 @@ const SB_URL='https://undpiclnsmmlipxaxxti.supabase.co';
 const SB_KEY='sb_publishable_-R2FQRy2fxKseO_4mkvuhA_NuO4gUPG';
 let sb=null,sbUser=null,sbPushT=null,sbTries=0,sbSyncing=false;
 function sbInit(){
-  if(!window.supabase){if(++sbTries<40){setTimeout(sbInit,300);return;}console.warn('Supabase JS não carregou a tempo; usando apenas armazenamento local.');return;}
+  if(!window.supabase){if(++sbTries<40){setTimeout(sbInit,300);return;}authGateError('Não foi possível carregar o serviço de login. Verifique sua conexão e recarregue a página.');return;}
   sbInitReal();
 }
 async function sbInitReal(){
   try{
     sb=window.supabase.createClient(SB_URL,SB_KEY);
+    authWire();
     sb.auth.onAuthStateChange((event,session)=>{
       sbUser=session&&session.user;
-      if(event==='SIGNED_IN'||event==='USER_UPDATED'){sbPull();if((location.hash||'').startsWith('#/materiais'))renderMateriais();}
+      if(session&&sbUser){authGateHide();sbUpsertProfile();if(event==='SIGNED_IN'){sbPull();if((location.hash||'').startsWith('#/materiais'))renderMateriais();}}
+      else if(event==='SIGNED_OUT'){sbUser=null;authGateShow();}
     });
-    let {data:{session}}=await sb.auth.getSession();
-    if(!session){
-      const {data,error}=await sb.auth.signInAnonymously();
-      if(error)throw error;
-      session=data.session;
-    }
+    const {data:{session}}=await sb.auth.getSession();
     sbUser=session&&session.user;
-    if(sbUser)await sbPull();
-  }catch(e){console.warn('Supabase indisponível (ative "Anonymous Sign-Ins" no painel do projeto); usando apenas armazenamento local.',e);}
+    if(sbUser){authGateHide();await sbPull();}
+    else authGateShow();
+  }catch(e){authGateError('Não foi possível conectar ao servidor. Verifique sua conexão e recarregue a página.');console.warn('Supabase indisponível.',e);}
+}
+/* ---------- Login obrigatório (e-mail + senha) ---------- */
+let authMode='in';
+function authGateShow(){const g=$('#authgate');if(g){g.classList.remove('hidden');document.body.classList.add('authlock');}}
+function authGateHide(){const g=$('#authgate');if(g){g.classList.add('hidden');document.body.classList.remove('authlock');}}
+function authMsg(t){const b=$('#authmsg');if(b)b.textContent=t||'';}
+function authGateError(t){authGateShow();authMsg(t);}
+function authErr(e){const m=((e&&e.message)||'').toLowerCase();
+  if(/invalid login|invalid credentials/.test(m))return 'E-mail ou senha incorretos.';
+  if(/email not confirmed/.test(m))return 'Confirme seu e-mail antes de entrar (veja sua caixa de entrada).';
+  if(/already registered|already been registered|user already exists/.test(m))return 'Este e-mail já tem conta. Use a aba "Entrar".';
+  if(/password should be at least|weak password|at least 6/.test(m))return 'A senha deve ter pelo menos 6 caracteres.';
+  if(/rate limit|too many requests|email rate/.test(m))return 'Muitas tentativas. Aguarde um momento e tente de novo.';
+  if(/signups? not allowed|signup is disabled|disabled/.test(m))return 'Cadastro desativado no momento.';
+  return (e&&e.message)||'Erro desconhecido.';}
+function authSetMode(m){authMode=m;
+  const nr=$('#authname-row');if(nr)nr.style.display=(m==='up')?'':'none';
+  const ti=$('#authtab-in'),tu=$('#authtab-up'),bt=$('#authsubmit'),pw=$('#authpw');
+  if(ti)ti.classList.toggle('on',m==='in');
+  if(tu)tu.classList.toggle('on',m==='up');
+  if(bt)bt.textContent=(m==='up')?'Criar conta':'Entrar';
+  if(pw)pw.setAttribute('autocomplete',(m==='up')?'new-password':'current-password');
+  authMsg('');}
+function authWire(){
+  const form=$('#authform');if(!form||form._wired)return;form._wired=1;
+  const ti=$('#authtab-in'),tu=$('#authtab-up');
+  if(ti)ti.onclick=()=>authSetMode('in');
+  if(tu)tu.onclick=()=>authSetMode('up');
+  form.addEventListener('submit',e=>{e.preventDefault();
+    const email=(($('#authemail').value)||'').trim();
+    const pw=($('#authpw').value)||'';
+    const name=(($('#authnameinput').value)||'').trim();
+    if(!email||!pw){authMsg('Preencha e-mail e senha.');return;}
+    if(authMode==='up'){if(pw.length<6){authMsg('A senha deve ter pelo menos 6 caracteres.');return;}sbSignUp(email,pw,name);}
+    else sbSignIn(email,pw);});
+  authSetMode('in');}
+async function sbSignIn(email,password){
+  if(!sb){authMsg('Serviço indisponível. Recarregue a página.');return;}
+  authMsg('Entrando…');
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error)authMsg(authErr(error));
+}
+async function sbSignUp(email,password,name){
+  if(!sb){authMsg('Serviço indisponível. Recarregue a página.');return;}
+  authMsg('Criando conta…');
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name:name||null},emailRedirectTo:location.origin+location.pathname}});
+  if(error){authMsg(authErr(error));return;}
+  if(data&&data.session){authMsg('');}
+  else authMsg('Conta criada! Enviamos um e-mail de confirmação para '+email+'. Confirme e depois entre.');
+}
+async function sbSignOut(){try{await sb.auth.signOut();}catch(e){}sbUser=null;authGateShow();}
+async function sbUpsertProfile(){
+  if(!sb||!sbUser)return;
+  try{
+    const md=sbUser.user_metadata||{};
+    const name=md.display_name||md.full_name||null;
+    await sb.from('profiles').upsert({id:sbUser.id,display_name:name},{onConflict:'id'});
+  }catch(e){}
 }
 async function sbPull(){
   if(!sb||!sbUser)return;
@@ -734,10 +823,12 @@ async function sbPushAll(){
 }
 
 function sbAccountStatusHTML(){
-  if(!sb)return '<p class="sub">Sincronização com a nuvem indisponível neste momento — seu progresso continua salvo neste navegador.</p>';
-  if(!sbUser)return '<p class="sub">Conectando à nuvem…</p>';
-  if(sbUser.email&&!sbUser.is_anonymous)return `<p class="sub">Conectado como <strong>${esc(sbUser.email)}</strong> — seu progresso sincroniza com qualquer aparelho em que você entrar com esse e-mail.</p>`;
-  return '<p class="sub">Este aparelho está usando uma conta anônima: seu progresso está salvo na nuvem, mas só é acessível deste navegador. Vincule um e-mail para acessar de outros aparelhos, sem perder nada do que já estudou.</p>';
+  if(!sb)return '<p class="sub">Serviço de conta indisponível no momento.</p>';
+  if(!sbUser)return '<p class="sub">Conectando à sua conta…</p>';
+  const md=sbUser.user_metadata||{};
+  const nome=md.display_name||md.full_name;
+  const quem=nome?`<strong>${esc(nome)}</strong> (${esc(sbUser.email||'')})`:`<strong>${esc(sbUser.email||'')}</strong>`;
+  return `<p class="sub">Você está conectado como ${quem}. Seu progresso é salvo no seu perfil e sincroniza entre aparelhos.</p><p><button class="btn" id="sboutbtn">Sair da conta</button></p>`;
 }
 async function sbLinkEmail(email){
   const box=$('#acctmsg');if(!box)return;
@@ -1435,7 +1526,7 @@ function notesMD(){
   return md;
 }
 function renderMateriais(){
-  V.innerHTML=`<h1>Backup e exportação</h1><p class="sub">Seus dados ficam salvos neste navegador e, se a sincronização estiver ativa, também na nuvem.</p><h2>Conta e sincronização entre aparelhos</h2>${sbAccountStatusHTML()}<p><input type="email" id="acctemail" placeholder="seu@email.com" style="max-width:280px"> <button class="btn" id="acctbtn">Vincular / Entrar</button></p><p class="sub" id="acctmsg"></p>
+  V.innerHTML=`<h1>Backup e exportação</h1><p class="sub">Seus dados ficam salvos neste navegador e, se a sincronização estiver ativa, também na nuvem.</p><h2>Conta e sincronização entre aparelhos</h2>${sbAccountStatusHTML()}<p class="sub" id="acctmsg"></p>
   <div class="tw"><table><thead><tr><th scope="col">Arquivo</th><th scope="col">Conteúdo</th><th scope="col"></th></tr></thead><tbody>
   <tr><td><strong>minhas-anotacoes.md</strong></td><td>Anotações, respostas dos exercícios e marcações, organizadas por módulo.</td><td><button class="btn" data-x="md">Baixar</button></td></tr>
   <tr><td><strong>backup-apostila.json</strong></td><td>Tudo o que você marcou e escreveu, para restaurar em outro navegador.</td><td><button class="btn" data-x="json">Baixar</button></td></tr>
@@ -1450,7 +1541,7 @@ function renderMateriais(){
     if(x==='py'){const c=U[0].blocks.find(b=>b.t==='code'&&b.lang==='PYTHON');dl('gerar_base.txt',c?c.text:'','text/plain');}});
   $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(typeof o!=='object'||!o.sec)throw 0;S=Object.assign(S,o);save();applyPrefs();buildMenus();toast('Backup restaurado');renderMateriais();}catch(err){toast('Arquivo inválido: escolha um backup-apostila.json');}};r.readAsText(f);};
   $('#wipe').onclick=()=>{if(confirm('Apagar todo o progresso, anotações e marcações deste navegador?')){S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},theme:S.theme,fs:S.fs,focus:false,last:null};save();buildMenus();toast('Dados apagados');}};
-  const acctBtn=$('#acctbtn');if(acctBtn)acctBtn.onclick=()=>{const email=($('#acctemail').value||'').trim();if(!email){$('#acctmsg').textContent='Digite um e-mail válido.';return;}sbLinkEmail(email);};
+  const sbOut=$('#sboutbtn');if(sbOut)sbOut.onclick=sbSignOut;
 }
 
 /* ---------- Ferramentas de estudo: flashcards + mapa mental (geradas do conteudo da aula) ---------- */
