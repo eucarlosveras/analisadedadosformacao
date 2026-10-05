@@ -568,6 +568,35 @@ td code,th code{white-space:nowrap}
 .esp-badge{flex:0 0 auto;min-width:1.4rem;height:1.4rem;padding:0 .2rem;border-radius:6px;color:#fff;font-weight:700;font-size:.72rem;display:flex;align-items:center;justify-content:center}
 .esp-modname{font-size:.82rem;font-weight:600;line-height:1.12}
 .esp-modname small{display:block;font-weight:500;opacity:.6;font-size:.72rem}
+
+/* ---- Trilha de Videos (Netflix-style) ---- */
+.vpage{display:flex;flex-direction:column;gap:1.7rem;margin-top:.4rem}
+.vrow-head{display:flex;align-items:center;gap:.5rem;margin:0 0 .55rem}
+.vrow-badge{width:26px;height:26px;border-radius:7px;color:#fff;font-weight:700;font-size:.85rem;display:grid;place-items:center;flex:none}
+.vrow-title{font-size:1.05rem;margin:0;font-family:var(--f-head)}
+.vrow-count{font-size:.78rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+.vrail{display:flex;gap:.7rem;overflow-x:auto;padding:.25rem .1rem .7rem;scroll-snap-type:x proximity;scrollbar-width:thin}
+.vrail::-webkit-scrollbar{height:8px}
+.vrail::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.vcard{flex:0 0 auto;width:230px;scroll-snap-align:start;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;text-align:left;padding:0;color:inherit;display:flex;flex-direction:column;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;font:inherit}
+.vcard:hover,.vcard:focus-visible{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 30px rgba(0,0,0,.35);border-color:var(--accent);z-index:2;outline:none}
+.vthumb{position:relative;aspect-ratio:16/9;background:#000;display:block}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vplay{position:absolute;inset:0;display:grid;place-items:center;font-size:1.7rem;color:#fff;background:rgba(0,0,0,.18);opacity:0;transition:opacity .15s ease}
+.vcard:hover .vplay,.vcard:focus-visible .vplay{opacity:1}
+.vtitle{font-weight:600;font-size:.9rem;line-height:1.25;padding:.5rem .6rem .1rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vauth{font-size:.77rem;color:var(--muted);padding:.1rem .6rem .6rem;margin-top:auto}
+.vmodal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.vmodal.open{display:flex}
+.vmodal-box{width:min(960px,96vw);max-height:92vh;background:var(--panel);border-radius:14px;overflow:hidden;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+.vframe{aspect-ratio:16/9;background:#000}
+.vframe iframe{width:100%;height:100%;border:0;display:block}
+.vmodal-cap{padding:.75rem 1rem;display:flex;gap:.5rem;align-items:baseline;flex-wrap:wrap}
+.vmodal-cap b{font-size:1rem}
+.vmodal-cap span{color:var(--muted);font-size:.85rem}
+.vmodal-x{position:absolute;top:8px;right:8px;z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:1.1rem;cursor:pointer;line-height:1}
+.vgoto{color:var(--accent);font-size:.85rem;text-decoration:none;font-weight:600}
+@media(max-width:640px){.vcard{width:180px}}
 </style>
 </head>
 <body>
@@ -577,6 +606,7 @@ td code,th code{white-space:nowrap}
 <a class="brand" href="#/inicio"><span class="logo" aria-hidden="true">AD</span><span class="bt">Do Zero ao Melhor Analista de Dados<small>trilha de estudos · v2.0</small></span></a>
 <a class="btn hide-focus" href="#/inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7M6 9.5V20h12V9.5"/></svg><span class="lbl">Início</span></a>
 <details class="menu" id="modmenu"><summary aria-label="Abrir índice de módulos">Módulos ▾</summary><div class="menupanel" id="menupanel"></div></details>
+    <a class="btn hide-focus" href="#/videos" aria-label="Vídeos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10 9.3 15 12l-5 2.7z"/></svg><span class="lbl">Vídeos</span></a>
     <a class="btn hide-focus" href="#/busca" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="lbl">Buscar</span></a>
     <a class="btn hide-focus" href="#/painel" aria-label="Meu progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Progresso</span></a>
     <button class="gam-chip" id="gamchip" type="button" title="Ofensiva, XP e nível" aria-label="Abrir meu progresso, ofensiva e XP"><svg class="gc-fire" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.2 3.4-1 4.6-1 6.8a3 3 0 0 0 5.8.9c1.6 2 2.2 3.7 2.2 5.6A7 7 0 1 1 6.2 12c1.2 1.2 2.4 1.1 3 0 .9-1.7-.7-3.3.4-5C10.8 5.6 12 4.2 12 2z"/></svg><span class="gc-n" id="gcstreak">0</span><span class="gc-sep"></span><span class="gc-lv" id="gclv">Nv 1</span></button>
@@ -596,6 +626,7 @@ td code,th code{white-space:nowrap}
   <button data-c="p" style="background:var(--hl-p)" title="Dúvida — revisar" aria-label="Marcar como dúvida"></button>
 </div>
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Imagem ampliada"><img alt=""></div>
+<div class="vmodal" id="vmodal" role="dialog" aria-label="Player de vídeo"><div class="vmodal-box"><button class="vmodal-x" id="vmodalx" aria-label="Fechar">✕</button><div class="vframe" id="vframe"></div><div class="vmodal-cap" id="vmodalcap"></div></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>window.MathJax={tex:{inlineMath:[]},svg:{fontCache:"global"},startup:{typeset:false}};</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -822,7 +853,7 @@ function buildMenus(){
   $('#menupanel').addEventListener('click',e=>{if(e.target.closest('a'))$('#modmenu').removeAttribute('open');});
 }
 document.addEventListener('click',e=>{const m=$('#modmenu');if(m.open&&!m.contains(e.target))m.removeAttribute('open');});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modmenu').removeAttribute('open');hideTool();$('#lightbox').style.display='none';}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modmenu').removeAttribute('open');hideTool();$('#lightbox').style.display='none';closeVideo();}});
 function markSide(uid,sid){}
 const DIFF_LABEL={1:'Tranquilo',2:'Deu trabalho',3:'Difícil — revisar'};
 const DIFF_MARK={1:'Revisão',2:'Médio',3:'Revisão urgente'};
@@ -928,13 +959,13 @@ function renderEspiral(){
   V.innerHTML='<div class="sheet"><p class="crumb"><a href="#/inicio">Trilha</a> › Trilha em espiral</p><h1>Trilha em espiral</h1><p class="sub" style="max-width:64ch">Método do <strong>currículo em espiral</strong> (Jerome Bruner) combinado com a <strong>Taxonomia de Bloom</strong>: em vez de esgotar um módulo e nunca mais voltar, você percorre os mesmos temas em <strong>quatro voltas</strong>, cada uma exigindo um nível de pensamento mais alto. Cada link abre a aula já na parte daquela volta.</p>'+voltasHTML+'</div>';
 }
 function route(){
-  hideTool();
+  hideTool();closeVideo();
   const h=location.hash||'#/inicio';const p=h.slice(2).split('/');
   let target=null,uid=null;
 if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s=>s.id===target))renderLesson(uid,target,p[3]);else renderCourse(uid);}
   else if(p[0]==='check'&&byId[p[1]]){uid=p[1];renderCheck(uid,parseInt(p[2],10)||1);}
   else if(p[0]==='revisar')renderRevisar();else if(p[0]==='espiral')renderEspiral();else if(p[0]==='guia')renderGuia();else if(p[0]==='painel')renderPainel();
-  else if(p[0]==='busca')renderBusca(decodeURIComponent(p[1]||''));else if(p[0]==='materiais')renderMateriais();
+  else if(p[0]==='videos')renderVideos();else if(p[0]==='busca')renderBusca(decodeURIComponent(p[1]||''));else if(p[0]==='materiais')renderMateriais();
   else renderHome();
   markSide(uid,target);
   document.body.classList.remove('sideopen');
@@ -978,6 +1009,7 @@ function bindCommon(root,uid){
 }
 function fallbackCopy(t,ok){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy');ok();}catch(e){toast('Não foi possível copiar');}x.remove();}
 $('#lightbox').addEventListener('click',()=>$('#lightbox').style.display='none');
+$('#vmodal').addEventListener('click',e=>{if(e.target.id==='vmodal'||e.target.id==='vmodalx'||e.target.closest('.vgoto'))closeVideo();});
 function highlight(root){if(!window.hljs){setTimeout(()=>window.hljs&&highlight(root),800);return;}
   $$('pre code[data-lang]',root).forEach(c=>{const l=c.dataset.lang;if(!l||c.dataset.done||!hljs.getLanguage(l))return;try{c.innerHTML=hljs.highlight(c.textContent,{language:l,ignoreIllegals:true}).value;c.dataset.done=1;}catch(e){}});}
 let mjTries=0;
@@ -1085,6 +1117,36 @@ function renderHome(){
   <p class="sub" style="margin-top:1.4rem">💾 Seu progresso fica salvo só neste navegador — <a href="#/materiais">faça backup</a> de vez em quando para não perder nada.</p>`;
   initBgConst();
 }
+function videoCatalog(){
+  const out=[];
+  MOD_ORDER.map(mid=>byId[mid]).filter(Boolean).sort((a,b)=>a.num-b.num).forEach(u=>{
+    const seen={},items=[];
+    (u.secs||[]).forEach(sx=>{
+      const arr=VID_CUR[sx.id];if(!arr||!arr.length)return;
+      arr.forEach(v=>{if(seen[v.id])return;seen[v.id]=1;items.push({id:v.id,t:v.t,a:v.a,sid:sx.id});});
+    });
+    if(items.length)out.push({u:u,items:items});
+  });
+  return out;
+}
+function renderVideos(){
+  const cat=videoCatalog();
+  const nv=cat.reduce((a,r)=>a+r.items.length,0);
+  const rows=cat.map(r=>{
+    const c=MC[r.u.id]||'var(--accent)';
+    const cards=r.items.map(v=>'<button class="vcard" type="button" data-vid="'+v.id+'" data-vt="'+esc(v.t)+'" data-va="'+esc(v.a)+'" data-uid="'+r.u.id+'" data-sid="'+v.sid+'"><span class="vthumb"><img loading="lazy" src="https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg" alt=""><span class="vplay" aria-hidden="true">\u25b6</span></span><span class="vtitle">'+esc(v.t)+'</span><span class="vauth">'+esc(v.a)+'</span></button>').join('');
+    return '<section class="vrow"><div class="vrow-head"><span class="vrow-badge" style="background:'+c+'">'+r.u.num+'</span><h2 class="vrow-title">'+esc(r.u.title)+'</h2><span class="vrow-count">'+r.items.length+' v\u00eddeo'+(r.items.length>1?'s':'')+'</span></div><div class="vrail">'+cards+'</div></section>';
+  }).join('');
+  V.innerHTML='<div class="sheet"><div class="hero"><div class="acell" aria-hidden="true"><small>v\u00eddeos</small>\u25b6</div><div><h1>Trilha de <span class="accent">V\u00eddeos</span></h1><p class="lede">'+nv+' aulas em v\u00eddeo, por m\u00f3dulo \u2014 clique para assistir</p></div></div></div><div class="vpage">'+rows+'</div>';
+  $$('.vcard',V).forEach(b=>b.addEventListener('click',()=>openVideo(b.dataset.vid,b.dataset.vt,b.dataset.va,b.dataset.uid,b.dataset.sid)));
+}
+function openVideo(id,t,a,uid,sid){
+  const m=$('#vmodal');if(!m)return;
+  $('#vframe').innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0" title="'+esc(t)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+  $('#vmodalcap').innerHTML='<b>'+esc(t)+'</b><span>'+esc(a)+'</span>'+((uid&&sid)?' \u00b7 <a href="#/u/'+uid+'/'+sid+'" class="vgoto">ir para a aula \u2192</a>':'');
+  m.classList.add('open');document.body.style.overflow='hidden';
+}
+function closeVideo(){const m=$('#vmodal');if(!m||!m.classList.contains('open'))return;m.classList.remove('open');const f=$('#vframe');if(f)f.innerHTML='';document.body.style.overflow='';}
 function renderCheck(uid,idx){
   const u=byId[uid];
   const block=LESSONS.find(l=>l.mod.id===uid&&l.idx===idx);
