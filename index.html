@@ -493,6 +493,10 @@ td code,th code{white-space:nowrap}
 .vid-item{position:relative}
 .vid-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000}
 .vid-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vid-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.attach-vid{display:block}
+.attach-vid .vid-frame{margin-bottom:.45rem}
+.attach-head{display:flex;align-items:center;gap:.5rem}
 .vid-rm{position:absolute;top:7px;right:7px;width:28px;height:28px;border:none;border-radius:8px;background:rgba(0,0,0,.62);color:#fff;cursor:pointer;font-size:.9rem;line-height:1;display:grid;place-items:center;opacity:0;transition:opacity .15s}
 .vid-item:hover .vid-rm,.vid-rm:focus-visible{opacity:1}
 .vid-rm:hover{background:var(--bad)}
@@ -1630,7 +1634,13 @@ async function initAttach(uid,sid){
       const {data:signed}=await sb.storage.from('study-attachments').createSignedUrl(r.storage_path,3600);
       return Object.assign({},r,{url:signed&&signed.signedUrl});
     }));
-    list.innerHTML=rows.map(r=>`<div class="attach-item"><a href="${r.url||'#'}" target="_blank" rel="noopener">${esc(r.file_name)}</a><span class="attach-meta">${fmtBytes(r.size_bytes)}</span><button type="button" class="attach-rm" data-id="${r.id}" data-path="${esc(r.storage_path)}" aria-label="Remover anexo">✕</button></div>`).join('');
+    list.innerHTML=rows.map(r=>{
+      const mt=r.mime_type||'';
+      const isVid=/^video\//.test(mt)||/\.(mp4|webm|ogg|ogv|mov|m4v|mkv)$/i.test(r.file_name||'');
+      const head='<div class="attach-head"><a href="'+(r.url||'#')+'" target="_blank" rel="noopener">'+esc(r.file_name)+'</a><span class="attach-meta">'+fmtBytes(r.size_bytes)+'</span><button type="button" class="attach-rm" data-id="'+r.id+'" data-path="'+esc(r.storage_path)+'" aria-label="Remover anexo">✕</button></div>';
+      if(isVid&&r.url)return '<div class="attach-item attach-vid"><div class="vid-frame"><video controls preload="metadata" playsinline src="'+r.url+'"></video></div>'+head+'</div>';
+      return '<div class="attach-item">'+head+'</div>';
+    }).join('');
     $$('.attach-rm',list).forEach(b=>b.onclick=async()=>{
       b.disabled=true;
       await sb.storage.from('study-attachments').remove([b.dataset.path]);
