@@ -694,14 +694,14 @@ async function sbInitReal(){
     sb=window.supabase.createClient(SB_URL,SB_KEY);
     authWire();
     sb.auth.onAuthStateChange((event,session)=>{
-      sbUser=session&&session.user;
-      if(session&&sbUser){authGateHide();sbUpsertProfile();if(event==='SIGNED_IN'){sbPull();if((location.hash||'').startsWith('#/materiais'))renderMateriais();}}
+      const u=session&&session.user;
+      if(u&&!u.is_anonymous){sbUser=u;authGateHide();sbUpsertProfile();if(event==='SIGNED_IN'){sbPull();if((location.hash||'').startsWith('#/materiais'))renderMateriais();}}
       else if(event==='SIGNED_OUT'){sbUser=null;authGateShow();}
     });
     const {data:{session}}=await sb.auth.getSession();
-    sbUser=session&&session.user;
-    if(sbUser){authGateHide();await sbPull();}
-    else authGateShow();
+    const u0=session&&session.user;
+    if(u0&&!u0.is_anonymous){sbUser=u0;authGateHide();await sbPull();}
+    else{if(u0&&u0.is_anonymous){try{await sb.auth.signOut();}catch(e){}}sbUser=null;authGateShow();}
   }catch(e){authGateError('Não foi possível conectar ao servidor. Verifique sua conexão e recarregue a página.');console.warn('Supabase indisponível.',e);}
 }
 /* ---------- Login obrigatório (e-mail + senha) ---------- */
