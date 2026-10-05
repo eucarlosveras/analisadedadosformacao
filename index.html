@@ -1122,8 +1122,10 @@ function videoCatalog(){
   MOD_ORDER.map(mid=>byId[mid]).filter(Boolean).sort((a,b)=>a.num-b.num).forEach(u=>{
     const seen={},items=[];
     (u.secs||[]).forEach(sx=>{
-      const arr=VID_CUR[sx.id];if(!arr||!arr.length)return;
-      arr.forEach(v=>{if(seen[v.id])return;seen[v.id]=1;items.push({id:v.id,t:v.t,a:v.a,sid:sx.id});});
+      const arr=VID_CUR[sx.id];
+      if(arr&&arr.length)arr.forEach(v=>{if(seen[v.id])return;seen[v.id]=1;items.push({id:v.id,t:v.t,a:v.a,sid:sx.id});});
+      const mine=(typeof S!=='undefined'&&S.vid&&S.vid[sx.id])||[];
+      mine.forEach(id=>{if(!id||seen[id])return;seen[id]=1;items.push({id:id,t:sx.t,a:'Seu vídeo',sid:sx.id});});
     });
     if(items.length)out.push({u:u,items:items});
   });
