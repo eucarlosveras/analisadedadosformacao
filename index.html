@@ -864,7 +864,7 @@ U.forEach(u=>{
   const walk=bs=>bs.forEach(b=>{if(b.t==='h2'){b.sid=u.id+'-s'+(++k);u.secs.push({id:b.sid,n:b.n||'',t:strip(b.h)});}if(b.t==='call')walk(b.blocks);});
   walk(u.blocks);
 });
-const MC={m1:'#234E82',m2:'#1F8A5B',m3:'#7A4DB8',m4:'#0E7C86',m5:'#D98A1F',m6:'#3673C4',m7:'#B5563A',m8:'#5A6B7F',m9:'#C2477A',m10:'#4F8A2E',m11:'#D0621F',m12:'#0D2E55',m13:'#6B4FA0',m14:'#A8342E',m15:'#1FA8A8',apresentacao:'#E8963A',projetos:'#01544D',glossario:'#5A6B7F',referencias:'#5A6B7F',checklist:'#1F8A5B',m16:'#1C6E8C'};
+const MC={m1:'#234E82',m2:'#1F8A5B',m3:'#7A4DB8',m4:'#0E7C86',m5:'#D98A1F',m6:'#3673C4',m7:'#B5563A',m8:'#5A6B7F',m9:'#C2477A',m10:'#4F8A2E',m11:'#D0621F',m12:'#0D2E55',m13:'#6B4FA0',m14:'#A8342E',m15:'#1FA8A8',apresentacao:'#E8963A',projetos:'#01544D',glossario:'#5A6B7F',referencias:'#5A6B7F',checklist:'#1F8A5B',m16:'#1C6E8C',m17:'#3D4EAD'};
 U.forEach(u=>u.color=MC[u.id]||'#234E82');
 const byId={};U.forEach(u=>byId[u.id]=u);
 const MODS=U.filter(u=>u.kind==='mod');
@@ -886,7 +886,7 @@ function groupByTier(secs){
   secs.forEach(s=>{const t=sectionTier(s.t);if(!cur||cur.tier!==t){cur={tier:t,items:[]};out.push(cur);}cur.items.push(s);});
   return out;
 }
-const MOD_ORDER=['m1','m2','m4','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10','m16'];
+const MOD_ORDER=['m1','m2','m4','m17','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10','m16'];
 const MOD_RANK={};MOD_ORDER.forEach((id,i)=>MOD_RANK[id]=i+1);
 const TIER_LABEL={1:'Fundamentos',2:'Aplicação',3:'Avançado',4:'Prática e avaliação'};
 const CHUNK_SIZE=1;
@@ -1316,7 +1316,7 @@ function renderCourse(uid){
   const r=31,circ=2*Math.PI*r,off=circ*(1-(n?k/n:0));
   const groups=groupByTier(u.secs);
   const blurb=courseBlurb(u);
-  const crumbLabel=u.kind==='mod'?`Módulo ${MOD_RANK[uid]||u.num} de 16`:'Material complementar';
+  const crumbLabel=u.kind==='mod'?`Módulo ${MOD_RANK[uid]||u.num} de 17`:'Material complementar';
   V.innerHTML=`<div class="sheet">
   <p class="crumb"><a href="#/inicio">Trilha</a> › ${esc(crumbLabel)}</p>
   <div class="course-head">
@@ -1472,7 +1472,7 @@ function renderPainel(){
   const recent=Object.entries(S.sec).filter(([k,v])=>v>1).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const secById={};U.forEach(u=>u.secs.forEach(s=>secById[s.id]=[u,s]));
   V.innerHTML=`<h1>Meu progresso</h1><p class="sub">Calculado a partir das aulas que você marcou como concluídas.</p>
-  <div class="grid"><div class="stat"><b>${Math.round(all.length?d/all.length*100:0)}%</b>da trilha concluída</div><div class="stat"><b>${MODS.filter(m=>S.done[m.id]).length}/16</b>módulos concluídos</div><div class="stat"><b>${clK}/${clN}</b>itens do checklist final</div><div class="stat"><b>${Object.values(S.hl).reduce((a,l)=>a+l.length,0)}</b>marcações feitas</div></div>
+  <div class="grid"><div class="stat"><b>${Math.round(all.length?d/all.length*100:0)}%</b>da trilha concluída</div><div class="stat"><b>${MODS.filter(m=>S.done[m.id]).length}/17</b>módulos concluídos</div><div class="stat"><b>${clK}/${clN}</b>itens do checklist final</div><div class="stat"><b>${Object.values(S.hl).reduce((a,l)=>a+l.length,0)}</b>marcações feitas</div></div>
   <h2>Por módulo</h2>${U.map(u=>{const k=secDone(u),n=u.secs.length;return `<div class="modrow"><a href="#/u/${u.id}">${u.kind==='mod'?u.code+' · ':''}${esc(u.title)}</a><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div><span class="saved">${k}/${n}</span></div>`;}).join('')}
   <h2>Concluídas recentemente</h2>${recent.length?'<ul>'+recent.map(([k,v])=>{const x=secById[k];return x?`<li><a href="#/u/${x[0].id}/${k}">${esc((x[1].n?x[1].n+' ':'')+x[1].t)}</a> <span class="saved">${fmtD(v)}</span></li>`:'';}).join('')+'</ul>':'<p class="sub">Nenhuma aula marcada ainda. Marque “concluída” no título de cada aula ao terminá-la.</p>'}
   <h2>Favoritos</h2>${Object.keys(S.bm).filter(k=>S.bm[k]&&byId[k]).map(k=>`<a class="btn" href="#/u/${k}" style="margin:.2rem">★ ${esc(byId[k].short+(byId[k].kind==='mod'?': '+byId[k].title:''))}</a>`).join('')||'<p class="sub">Use “Favoritar” no topo de um módulo para criar atalhos aqui.</p>'}`;
