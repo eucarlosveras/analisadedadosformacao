@@ -524,6 +524,57 @@ td code,th code{white-space:nowrap}
 .vid-tools{margin:.2rem 0 1.1rem}
 .vid-subh{font-family:var(--f-head);font-weight:700;font-size:.9rem;color:var(--ink);margin:.4rem 0 .5rem}
 .vids-cur .vid-cap span{color:var(--accent)}
+
+/* ===== Sidebar de progresso (navegação da trilha) ===== */
+.sidenav{position:fixed;top:var(--hh,110px);left:0;bottom:0;width:300px;max-width:85vw;background:var(--panel);border-right:1px solid var(--line);z-index:38;overflow:auto;padding:.4rem 0 2rem;transform:translateX(-102%);transition:transform .22s ease;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+body.sideopen .sidenav{transform:none;box-shadow:0 24px 60px rgba(0,0,0,.32)}
+.sidenav-backdrop{position:fixed;inset:var(--hh,110px) 0 0 0;background:rgba(5,10,16,.42);z-index:37;border:0}
+.sn-head{font-family:var(--f-head);font-weight:800;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:.5rem 1rem .2rem}
+.sn-sec{font-family:var(--f-head);font-weight:700;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:.9rem 1rem .3rem;margin-top:.2rem;border-top:1px solid var(--soft)}
+.sn-cont{display:block;margin:.3rem .7rem .2rem;padding:.5rem .7rem;border-radius:8px;background:var(--accent-soft);color:var(--accent-2);font-weight:700;font-size:.9rem;text-decoration:none}
+.sn-cont:hover{background:var(--accent-dim)}
+.sn-mod{display:flex;align-items:center;gap:.6rem;padding:.5rem .9rem;text-decoration:none;color:var(--ink);border-left:3px solid transparent}
+.sn-mod:hover{background:var(--soft)}
+.sn-mod.active{background:var(--accent-dim);border-left-color:var(--mc,var(--accent))}
+.sn-ck{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.76rem;font-weight:600;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.sn-mod.done .sn-ck{background:var(--good);color:#fff;border-color:var(--good)}
+.sn-tx{min-width:0;flex:1}
+.sn-tx b{display:block;font-family:var(--f-head);font-weight:600;font-size:.88rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-bar{display:block;height:4px;border-radius:3px;background:var(--soft);margin-top:.3rem;overflow:hidden}
+.sn-bar i{display:block;height:100%;background:var(--mc,var(--accent));border-radius:3px}
+.sn-pc{flex:none;font-family:var(--f-mono);font-size:.72rem;color:var(--faint)}
+.sn-link{display:block;padding:.45rem 1rem;color:var(--ink);text-decoration:none;font-size:.9rem;font-weight:600}
+.sn-link:hover{background:var(--soft)}
+.sn-link.active{color:var(--accent-2);background:var(--accent-dim)}
+
+/* ===== Página Notas ===== */
+.nota-mod{margin:1.4rem 0}
+.nota-mavg{margin-left:auto;font-family:var(--f-mono);font-weight:700;font-size:.95rem;padding:.08em .5em;border-radius:6px}
+.nota-mavg.ok{background:var(--hl-g);color:var(--good)}
+.nota-mavg.mid{background:var(--hl-y);color:var(--warn)}
+.nota-mavg.low{background:var(--hl-p);color:var(--bad)}
+.nota-wrap{overflow-x:auto}
+.nota-tbl{width:100%;border-collapse:collapse;font-size:.92rem}
+.nota-tbl th,.nota-tbl td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--soft)}
+.nota-tbl th{font-family:var(--f-head);font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
+.nota-tbl .num{text-align:right;font-family:var(--f-mono);white-space:nowrap}
+.nota-pct{font-weight:700;padding:.05em .45em;border-radius:5px}
+.nota-pct.ok{background:var(--hl-g);color:var(--good)}
+.nota-pct.mid{background:var(--hl-y);color:var(--warn)}
+.nota-pct.low{background:var(--hl-p);color:var(--bad)}
+
+/* ===== Página Observações ===== */
+.obs-grid{display:grid;gap:.9rem;margin-top:1rem}
+@media(min-width:720px){.obs-grid{grid-template-columns:1fr 1fr}}
+.obs-card{border:1px solid var(--line);border-left:4px solid var(--mc,var(--accent));border-radius:10px;padding:.7rem .8rem;background:var(--panel)}
+.obs-h{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.obs-h a{text-decoration:none;color:var(--ink);font-family:var(--f-head);font-weight:600;font-size:.92rem}
+.obs-h a:hover{color:var(--accent-2)}
+.obs-badge{margin-left:auto;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);background:var(--soft);padding:.12em .5em;border-radius:5px}
+.obs-card.has .obs-badge{color:var(--good);background:var(--hl-g)}
+.obs-card textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--ink);padding:.5rem .6rem;resize:vertical;font-size:.9rem;line-height:1.5}
+.obs-card textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.obs-card .saved{font-size:.72rem;color:var(--faint);margin-top:.25rem;min-height:1em}
 </style>
 <style>
 .diff{margin:2rem 0;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:12px;background:var(--card,rgba(128,128,128,.05))}
@@ -654,12 +705,15 @@ body.authlock{overflow:hidden}
 <a class="skip" href="#main">Pular para o conteúdo</a>
 <header class="top" role="banner">
   <div class="ribbon">
+<button class="btn ico" id="sidebtn" type="button" aria-expanded="false" aria-controls="sidenav" title="Navegação da trilha" aria-label="Abrir navegação da trilha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <a class="brand" href="#/inicio"><span class="logo" aria-hidden="true">AD</span><span class="bt">Do Zero ao Melhor Analista de Dados<small>trilha de estudos · v2.0</small></span></a>
 <a class="btn hide-focus" href="#/inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7M6 9.5V20h12V9.5"/></svg><span class="lbl">Início</span></a>
 <details class="menu" id="modmenu"><summary aria-label="Abrir índice de módulos">Módulos ▾</summary><div class="menupanel" id="menupanel"></div></details>
     <a class="btn hide-focus" href="#/videos" aria-label="Vídeos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10 9.3 15 12l-5 2.7z"/></svg><span class="lbl">Vídeos</span></a>
     <a class="btn hide-focus" href="#/busca" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span class="lbl">Buscar</span></a>
     <a class="btn hide-focus" href="#/painel" aria-label="Meu progresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Progresso</span></a>
+    <a class="btn hide-focus" href="#/notas" aria-label="Minhas notas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="lbl">Notas</span></a>
+    <a class="btn hide-focus" href="#/observacoes" aria-label="Observações"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span class="lbl">Observações</span></a>
     <button class="gam-chip" id="gamchip" type="button" title="Ofensiva, XP e nível" aria-label="Abrir meu progresso, ofensiva e XP"><svg class="gc-fire" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.2 3.4-1 4.6-1 6.8a3 3 0 0 0 5.8.9c1.6 2 2.2 3.7 2.2 5.6A7 7 0 1 1 6.2 12c1.2 1.2 2.4 1.1 3 0 .9-1.7-.7-3.3.4-5C10.8 5.6 12 4.2 12 2z"/></svg><span class="gc-n" id="gcstreak">0</span><span class="gc-sep"></span><span class="gc-lv" id="gclv">Nv 1</span></button>
     <button class="btn ico" id="fontbtn" title="Tamanho da fonte" aria-label="Tamanho da fonte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 8.5 5h1L15 19M5 14h7M17 10h5M19.5 7.5v5"/></svg></button>
     <button class="btn ico" id="focusbtn" aria-pressed="false" title="Modo foco" aria-label="Modo foco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
@@ -668,6 +722,8 @@ body.authlock{overflow:hidden}
   <div class="progtop" aria-hidden="true"><i id="progtop"></i></div>
 </header>
 <div class="wrap">
+  <aside id="sidenav" class="sidenav" aria-label="Navegação da trilha" aria-hidden="true"></aside>
+  <div class="sidenav-backdrop" id="sidebackdrop" hidden></div>
   <main id="main" tabindex="-1"><div class="col" id="view"></div></main>
 </div>
 <div id="hltool" role="toolbar" aria-label="Marcar texto">
@@ -689,7 +745,7 @@ body.authlock{overflow:hidden}
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const V=$('#view');
 const KEY='apostila-analista-dados-v1';
-let S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},vid:{},diff:{},theme:null,fs:17,focus:false,last:null};
+let S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},vid:{},diff:{},quiz:{},theme:null,fs:17,focus:false,last:null};
 try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(o)S=Object.assign(S,o);}catch(e){}
 let saveT=null;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}updTop();sbQueuePush();},250);}
@@ -787,7 +843,8 @@ async function sbPull(){
       sb.from('study_highlights').select('unit_id,block_id,text_content,color').eq('user_id',uid),
       sb.from('study_bookmarks').select('unit_id').eq('user_id',uid),
     ]);
-    const hasRemote=!!(prefsR.data||(secR.data&&secR.data.length)||(doneR.data&&doneR.data.length)||(ansR.data&&ansR.data.length)||(chkR.data&&chkR.data.length)||(hlR.data&&hlR.data.length)||(bmR.data&&bmR.data.length));
+    let qzData=null;try{const qzR=await sb.from('study_quiz_scores').select('section_id,unit_id,best_score,total,attempts,taken_at').eq('user_id',uid);qzData=qzR.data||null;}catch(e){}
+    const hasRemote=!!(prefsR.data||(secR.data&&secR.data.length)||(doneR.data&&doneR.data.length)||(ansR.data&&ansR.data.length)||(chkR.data&&chkR.data.length)||(hlR.data&&hlR.data.length)||(bmR.data&&bmR.data.length)||(qzData&&qzData.length));
     if(hasRemote){
       if(prefsR.data){S.theme=prefsR.data.theme||null;S.fs=prefsR.data.font_size||17;S.focus=!!prefsR.data.focus_mode;S.last=prefsR.data.last_unit_id||null;}
       (secR.data||[]).forEach(r=>{S.sec[r.section_id]=new Date(r.studied_at).getTime();});
@@ -796,6 +853,7 @@ async function sbPull(){
       (chkR.data||[]).forEach(r=>{S.chk[r.check_key]=!!r.checked;});
       S.hl={};(hlR.data||[]).forEach(r=>{(S.hl[r.unit_id]=S.hl[r.unit_id]||[]).push({b:r.block_id,t:r.text_content,c:r.color});});
       (bmR.data||[]).forEach(r=>{S.bm[r.unit_id]=true;});
+      if(qzData){S.quiz={};qzData.forEach(r=>{S.quiz[r.section_id]={u:r.unit_id,best:r.best_score,total:r.total,n:r.attempts,at:new Date(r.taken_at).getTime()};});}
       if(prefsR.data){vidMerge(prefsR.data.videos);gamMerge(prefsR.data.gamification);diffMerge(prefsR.data.difficulty);}
       try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
       applyPrefs();buildMenus();updTop();route();
@@ -830,6 +888,7 @@ async function sbPushAll(){
     const bmRows=Object.keys(S.bm).filter(k=>S.bm[k]).map(k=>({user_id:uid,unit_id:k}));
     await sb.from('study_bookmarks').delete().eq('user_id',uid);
     if(bmRows.length)await sb.from('study_bookmarks').insert(bmRows);
+    try{const qzRows=Object.keys(S.quiz||{}).filter(k=>S.quiz[k]).map(k=>({user_id:uid,section_id:k,unit_id:S.quiz[k].u||null,best_score:S.quiz[k].best|0,total:S.quiz[k].total|0,attempts:S.quiz[k].n|0,taken_at:new Date(S.quiz[k].at||Date.now()).toISOString()}));await sb.from('study_quiz_scores').delete().eq('user_id',uid);if(qzRows.length)await sb.from('study_quiz_scores').insert(qzRows);}catch(e){console.warn('Falha ao sincronizar notas dos quizzes.',e);}
   }catch(e){console.warn('Falha ao sincronizar progresso com Supabase.',e);}
   sbSyncing=false;
 }
@@ -959,7 +1018,7 @@ $('#fontbtn').onclick=()=>{S.fs=S.fs>=19?16:S.fs+1;applyPrefs();save();toast('Fo
 $('#focusbtn').onclick=()=>{S.focus=!S.focus;applyPrefs();save();toast(S.focus?'Modo foco ativado':'Modo foco desativado');};
 
 /* ---------- menus ---------- */
-const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona a trilha'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/revisar','Para revisar'],['#/espiral','Trilha em espiral'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
+const PARTS=[['#/inicio','Trilha'],['#/guia','Como funciona a trilha'],['#/u/apresentacao','Apresentação e base de estudo'],['#/painel','Meu progresso'],['#/notas','Minhas notas'],['#/observacoes','Observações'],['#/revisar','Para revisar'],['#/espiral','Trilha em espiral'],['#/busca','Buscar'],['#/materiais','Backup e exportação']];
 function buildMenus(){
   let h='<div class="parts">'+PARTS.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('')+'</div><hr style="border:0;border-top:1px solid var(--line)">';
   h+=U.filter(u=>u.id!=='apresentacao').map(u=>`<details style="--dotc:${u.color}"><summary><span class="dot"></span>${u.kind==='mod'?'Módulo '+u.num+' — ':''}${esc(u.title)}${u.kind==='mod'&&MOD_RANK[u.id]?` <span class="rankbadge">${MOD_RANK[u.id]}ª na trilha</span>`:''}</summary><ol style="list-style:none;padding-left:.6rem">`+groupByTier(u.secs).map(g=>`<li class="tocsub">${TIER_LABEL[g.tier]}</li>`+g.items.map(s=>`<li><a href="#/u/${u.id}/${s.id}">${s.n?`<span class="mono" style="border:0;background:none">${esc(s.n)}</span> `:''}${esc(s.t)}${jobTagToc(s.id)}</a></li>`).join('')).join('')+'</ol></details>').join('');
@@ -968,7 +1027,68 @@ function buildMenus(){
 }
 document.addEventListener('click',e=>{const m=$('#modmenu');if(m.open&&!m.contains(e.target))m.removeAttribute('open');});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modmenu').removeAttribute('open');hideTool();$('#lightbox').style.display='none';closeVideo();}});
-function markSide(uid,sid){}
+/* ---------- Sidebar de progresso (navegação da trilha) ---------- */
+function sidePct(u){return u.secs.length?Math.round(secDone(u)/u.secs.length*100):0;}
+function modIsDone(u){return !!S.done[u.id]||(u.secs.length>0&&secDone(u)===u.secs.length);}
+function buildSideNav(active){
+  const el=document.getElementById('sidenav');if(!el)return;
+  const row=(mid,i)=>{const u=byId[mid];if(!u)return '';const p=sidePct(u);const dn=modIsDone(u);
+    return `<a class="sn-mod${active===mid?' active':''}${dn?' done':''}" href="#/u/${u.id}" style="--mc:${u.color||'var(--accent)'}">`
+      +`<span class="sn-ck" aria-hidden="true">${dn?'✔':(i!=null?i+1:'•')}</span>`
+      +`<span class="sn-tx"><b>${esc(u.title)}</b><span class="sn-bar" aria-hidden="true"><i style="width:${p}%"></i></span></span>`
+      +`<span class="sn-pc">${secDone(u)}/${u.secs.length}</span></a>`;};
+  const extras=['apresentacao','projetos','glossario','referencias','checklist'];
+  let h='<div class="sn-head">Minha trilha</div>';
+  h+=`<a class="sn-cont" href="${(typeof gamNextHref==='function')?gamNextHref():'#/inicio'}">▸ Continuar de onde parei</a>`;
+  h+='<div class="sn-sec">Módulos</div>'+MOD_ORDER.map((m,i)=>row(m,i)).join('');
+  h+='<div class="sn-sec">Complementos</div>'+extras.map(m=>row(m,null)).join('');
+  h+='<div class="sn-sec">Atalhos</div>'
+    +`<a class="sn-link${active==='painel'?' active':''}" href="#/painel">📊 Meu progresso</a>`
+    +`<a class="sn-link${active==='notas'?' active':''}" href="#/notas">✓ Minhas notas</a>`
+    +`<a class="sn-link${active==='observacoes'?' active':''}" href="#/observacoes">✎ Observações</a>`;
+  el.innerHTML=h;
+}
+function markSide(uid,sid){try{buildSideNav(uid||((location.hash||'#/').slice(2).split('/')[0]));}catch(e){}}
+function sideInit(){
+  const btn=document.getElementById('sidebtn'),bd=document.getElementById('sidebackdrop'),el=document.getElementById('sidenav');
+  const close=()=>{document.body.classList.remove('sideopen');if(btn)btn.setAttribute('aria-expanded','false');if(bd)bd.hidden=true;if(el)el.setAttribute('aria-hidden','true');};
+  const open=()=>{document.body.classList.add('sideopen');if(btn)btn.setAttribute('aria-expanded','true');if(bd)bd.hidden=false;if(el)el.setAttribute('aria-hidden','false');};
+  if(btn)btn.onclick=()=>{document.body.classList.contains('sideopen')?close():open();};
+  if(bd)bd.onclick=close;
+  if(el)el.addEventListener('click',e=>{if(e.target.closest('a'))close();});
+  window.addEventListener('hashchange',close);
+  buildSideNav();
+}
+/* ---------- Notas (quizzes) ---------- */
+function quizRecord(uid,sid,score,total){if(!total)return;const prev=S.quiz[sid];const best=prev?Math.max(prev.best|0,score):score;const n=(prev&&prev.n?prev.n:0)+1;S.quiz[sid]={u:uid,best:best,total:total,n:n,at:Date.now()};save();markSide(uid,sid);}
+function renderNotas(){
+  const rows=[];const allPct=[];
+  MOD_ORDER.concat(['apresentacao','projetos']).forEach(mid=>{
+    const u=byId[mid];if(!u)return;
+    const taken=u.secs.filter(s=>S.quiz[s.id]);if(!taken.length)return;
+    const items=taken.map(s=>{const q=S.quiz[s.id];const pct=q.total?Math.round(q.best/q.total*100):0;allPct.push(pct);
+      return `<tr><td>${esc((s.n?s.n+' ':'')+s.t)}</td><td class="num">${q.best}/${q.total}</td><td class="num"><span class="nota-pct ${pct>=70?'ok':pct>=40?'mid':'low'}">${pct}%</span></td><td class="num">${q.n}</td></tr>`;}).join('');
+    const mAvg=Math.round(taken.reduce((a,s)=>{const q=S.quiz[s.id];return a+(q.total?q.best/q.total*100:0);},0)/taken.length);
+    rows.push(`<div class="nota-mod"><h2 class="sec"><span class="hn2 nb" style="background:${u.color||'var(--accent)'}">${esc(String(u.num||'•'))}</span><span>${esc(u.title)}</span><span class="nota-mavg ${mAvg>=70?'ok':mAvg>=40?'mid':'low'}">${mAvg}%</span></h2><div class="nota-wrap"><table class="nota-tbl"><thead><tr><th>Aula</th><th class="num">Acertos</th><th class="num">Nota</th><th class="num">Tentativas</th></tr></thead><tbody>${items}</tbody></table></div></div>`);
+  });
+  const overall=allPct.length?Math.round(allPct.reduce((a,b)=>a+b,0)/allPct.length):0;
+  let body;
+  if(!rows.length){
+    body='<p class="sub">Você ainda não fez nenhum quiz. Abra uma aula e use <b>“Fazer quiz”</b> nas ferramentas de estudo — suas notas aparecem aqui e ficam salvas no seu perfil, sincronizadas entre aparelhos.</p>';
+  }else{
+    body=`<div class="grid"><div class="stat"><b>${overall}%</b>média geral nos quizzes</div><div class="stat"><b>${allPct.length}</b>quizzes realizados</div><div class="stat"><b>${allPct.filter(p=>p>=70).length}</b>aulas com 70%+</div></div>`+rows.join('');
+  }
+  V.innerHTML=`<h1>Minhas notas</h1><p class="sub">Resultado dos quizzes de múltipla escolha, por módulo. Guardamos sempre a sua melhor tentativa de cada aula.</p>${body}`;
+}
+/* ---------- Observações (anotações reunidas) ---------- */
+function renderObs(){
+  const list=MOD_ORDER.map(mid=>byId[mid]).filter(Boolean);
+  const withNotes=list.filter(u=>(S.ans[u.id+'-notas']||'').trim()).length;
+  const cards=list.map(u=>{const k=u.id+'-notas';const v=S.ans[k]||'';const has=!!v.trim();
+    return `<div class="obs-card${has?' has':''}" style="--mc:${u.color||'var(--accent)'}"><div class="obs-h"><a href="#/u/${u.id}"><b>${esc(u.title)}</b></a><span class="obs-badge">${has?'anotado':'vazio'}</span></div><textarea id="ta-${k}" data-k="${k}" rows="3" placeholder="Escreva aqui suas observações sobre ${esc(u.title)}…">${esc(v)}</textarea><div class="saved" data-s="${k}">${v?'Salvo':''}</div></div>`;}).join('');
+  V.innerHTML=`<h1>Observações</h1><p class="sub">Suas anotações de cada módulo, reunidas num só lugar. São as mesmas que aparecem dentro do módulo e ficam salvas no seu perfil.</p><div class="grid"><div class="stat"><b>${withNotes}/${list.length}</b>módulos com anotações</div></div><div class="obs-grid">${cards}</div>`;
+  bindCommon(V,null);
+}
 const DIFF_LABEL={1:'Tranquilo',2:'Deu trabalho',3:'Difícil — revisar'};
 const DIFF_MARK={1:'Revisão',2:'Médio',3:'Revisão urgente'};
 function diffMerge(remote){if(!remote||typeof remote!=='object')return;S.diff=Object.assign({},remote,S.diff||{});}
@@ -1080,6 +1200,7 @@ if(p[0]==='u'&&byId[p[1]]){uid=p[1];target=p[2];if(target&&byId[uid].secs.some(s
   else if(p[0]==='check'&&byId[p[1]]){uid=p[1];renderCheck(uid,parseInt(p[2],10)||1);}
   else if(p[0]==='revisar')renderRevisar();else if(p[0]==='espiral')renderEspiral();else if(p[0]==='guia')renderGuia();else if(p[0]==='painel')renderPainel();
   else if(p[0]==='videos')renderVideos();else if(p[0]==='busca')renderBusca(decodeURIComponent(p[1]||''));else if(p[0]==='materiais')renderMateriais();
+  else if(p[0]==='notas')renderNotas();else if(p[0]==='observacoes')renderObs();
   else renderHome();
   markSide(uid,target);
   document.body.classList.remove('sideopen');
@@ -1351,7 +1472,7 @@ function renderCourse(uid){
   ${ta(uid+'-notas','Resumo com suas palavras, dúvidas, links úteis…',8)}
   </div>`;
   bindCommon(V,uid);
-  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Módulo concluído. Bom trabalho!');gamAward('done:'+uid,60,'Módulo concluído');}save();renderCourse(uid);};
+  const db=$('#donebtn');if(db)db.onclick=()=>{if(S.done[uid])delete S.done[uid];else{S.done[uid]=Date.now();toast('Módulo concluído. Bom trabalho!');gamAward('done:'+uid,60,'Módulo concluído');}save();markSide(uid);renderCourse(uid);};
   const bb=$('#bmbtn');if(bb)bb.onclick=()=>{S.bm[uid]=!S.bm[uid];save();bb.textContent=S.bm[uid]?'★ Nos favoritos':'☆ Favoritar';bb.setAttribute('aria-pressed',!!S.bm[uid]);};
 }
 function lessonBlocks(u,sid){
@@ -1559,8 +1680,8 @@ function renderMateriais(){
     if(x==='md')dl('minhas-anotacoes.md',notesMD(),'text/markdown');
     if(x==='json')dl('backup-apostila.json',JSON.stringify(S,null,1),'application/json');
     if(x==='py'){const c=U[0].blocks.find(b=>b.t==='code'&&b.lang==='PYTHON');dl('gerar_base.txt',c?c.text:'','text/plain');}});
-  $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(typeof o!=='object'||!o.sec)throw 0;S=Object.assign(S,o);save();applyPrefs();buildMenus();toast('Backup restaurado');renderMateriais();}catch(err){toast('Arquivo inválido: escolha um backup-apostila.json');}};r.readAsText(f);};
-  $('#wipe').onclick=()=>{if(confirm('Apagar todo o progresso, anotações e marcações deste navegador?')){S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},theme:S.theme,fs:S.fs,focus:false,last:null};save();buildMenus();toast('Dados apagados');}};
+  $('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(typeof o!=='object'||!o.sec)throw 0;S=Object.assign(S,o);save();applyPrefs();buildMenus();markSide();toast('Backup restaurado');renderMateriais();}catch(err){toast('Arquivo inválido: escolha um backup-apostila.json');}};r.readAsText(f);};
+  $('#wipe').onclick=()=>{if(confirm('Apagar todo o progresso, anotações e marcações deste navegador?')){S={sec:{},done:{},ans:{},chk:{},hl:{},bm:{},vid:{},diff:{},quiz:{},theme:S.theme,fs:S.fs,focus:false,last:null};save();buildMenus();markSide();toast('Dados apagados');}};
   const sbOut=$('#sboutbtn');if(sbOut)sbOut.onclick=sbSignOut;
 }
 
@@ -1715,7 +1836,7 @@ function openQuiz(uid,sid){const q=quizBuild(uid,sid);if(q.questions.length<3){s
   wrap.style.setProperty('--fcaccent',q.color||cssVar('--accent'));
   function render(){answered=false;const cur=q.questions[i];bar.style.width=(i/q.questions.length*100)+'%';cnt.textContent='Pergunta '+(i+1)+' de '+q.questions.length;stem.textContent=cur.stem;optsEl.innerHTML='';cur.options.forEach((o,oi)=>{const btn=document.createElement('button');btn.className='qz-opt';btn.type='button';btn.innerHTML='<span class="qz-key">'+String.fromCharCode(65+oi)+'</span><span class="qz-txt">'+esc(o.text)+'</span>';btn.onclick=()=>choose(oi,btn);optsEl.appendChild(btn);});nextBtn.disabled=true;nextBtn.textContent=(i===q.questions.length-1)?'Ver resultado':'Pr\u00f3xima';scoreEl.textContent='Acertos: '+score+'/'+q.questions.length;}
   function choose(oi,btn){if(answered)return;answered=true;const cur=q.questions[i];const btns=$$('.qz-opt',optsEl);btns.forEach((b,bi)=>{b.disabled=true;if(cur.options[bi].correct)b.classList.add('ok');});if(cur.options[oi].correct)score++;else btn.classList.add('bad');scoreEl.textContent='Acertos: '+score+'/'+q.questions.length;nextBtn.disabled=false;}
-  function finish(){const pct=Math.round(score/q.questions.length*100);let vt,vc;if(pct>=80){vt='Excelente!';vc='var(--good)';}else if(pct>=60){vt='Bom trabalho!';vc='var(--accent)';}else if(pct>=40){vt='D\u00e1 para melhorar';vc='var(--orange)';}else{vt='Vale revisar a aula';vc='var(--bad)';}wrap.innerHTML='<div class="qz-result"><div class="qz-rscore" style="--c:'+vc+';--p:'+pct+'"><i>'+pct+'%</i></div><b>'+vt+'</b><span>Voc\u00ea acertou '+score+' de '+q.questions.length+' perguntas.</span><div class="qz-ractions"><button class="stbtn" id="qzredo" type="button">\u21bb Refazer quiz</button></div></div>';nextBtn.style.display='none';scoreEl.textContent='';const rd=$('#qzredo',w);if(rd)rd.onclick=()=>openQuiz(uid,sid);if(typeof gamAward==='function')gamAward('quiz:'+sid+':'+todayStr(),3+score*2,'Quiz conclu\u00eddo');}
+  function finish(){const pct=Math.round(score/q.questions.length*100);let vt,vc;if(pct>=80){vt='Excelente!';vc='var(--good)';}else if(pct>=60){vt='Bom trabalho!';vc='var(--accent)';}else if(pct>=40){vt='D\u00e1 para melhorar';vc='var(--orange)';}else{vt='Vale revisar a aula';vc='var(--bad)';}wrap.innerHTML='<div class="qz-result"><div class="qz-rscore" style="--c:'+vc+';--p:'+pct+'"><i>'+pct+'%</i></div><b>'+vt+'</b><span>Voc\u00ea acertou '+score+' de '+q.questions.length+' perguntas.</span><div class="qz-ractions"><button class="stbtn" id="qzredo" type="button">\u21bb Refazer quiz</button></div></div>';nextBtn.style.display='none';scoreEl.textContent='';const rd=$('#qzredo',w);if(rd)rd.onclick=()=>openQuiz(uid,sid);quizRecord(uid,sid,score,q.questions.length);if(typeof gamAward==='function')gamAward('quiz:'+sid+':'+todayStr(),3+score*2,'Quiz conclu\u00eddo');}
   nextBtn.onclick=()=>{if(!answered)return;if(i<q.questions.length-1){i++;render();}else finish();};
   render();
   ST_KEYHANDLER=e=>{if(!answered){const n=parseInt(e.key,10);const opts=q.questions[i].options;if(n>=1&&n<=opts.length){const btns=$$('.qz-opt',optsEl);choose(n-1,btns[n-1]);}}else if(e.key==='Enter'){nextBtn.click();}};
@@ -1817,7 +1938,7 @@ function openGam(){let g=S.gam;if(!g){gamInit();g=S.gam;}const t=todayStr();cons
 }
 
 /* ---------- init ---------- */
-applyPrefs();buildMenus();updTop();route();
+applyPrefs();buildMenus();sideInit();updTop();route();
 gamInit();updGam();{const _gc=$('#gamchip');if(_gc)_gc.onclick=openGam;}
 sbInit();
 
