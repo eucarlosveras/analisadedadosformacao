@@ -556,6 +556,12 @@ body.sideopen .sidenav{transform:none;box-shadow:0 24px 60px rgba(0,0,0,.32)}
 .lesson.lk-video .ltype{color:var(--ref-r)}
 .lesson.lk-leitura .ltype{color:var(--accent)}
 
+/* ===== Caixas de objetivo e recap (didática estilo Coursera) ===== */
+.lp-objbox,.lp-recapbox{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:.65rem .9rem;margin:1rem 0;background:var(--accent-dim)}
+.lp-recapbox{border-left-color:var(--good);background:var(--hl-g)}
+.lp-objbox .lab,.lp-recapbox .lab{font-family:var(--f-head);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 .3rem}
+.lp-objbox p:last-child,.lp-recapbox p:last-child{margin:0}
+
 /* ===== Página de aula estilo Coursera ===== */
 .lp-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:.3rem 0 .3rem}
 .lp-type{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;font-weight:600}
@@ -1186,6 +1192,8 @@ function rb(b,uid){
     case 'h2':return `<h2 class="sec" id="${b.sid}"><span class="hn2${b.n?'':' nb'}">${b.n?esc(b.n):'¶'}</span><span>${b.h}</span>${jobTag(b.sid)}<label class="secchk" title="Marque quando terminar esta aula"><input type="checkbox" data-sec="${b.sid}" ${S.sec[b.sid]?'checked':''}> concluída</label></h2>`;
     case 'h3':return `<h3>${b.h}${bloomTag(b.h)}</h3>`;
     case 'p':return `<p>${b.h}</p>`;
+    case 'obj':return `<div class="lp-objbox"><p class="lab">🎯 Nesta aula</p><p>${b.h}</p></div>`;
+    case 'recap':return `<div class="lp-recapbox"><p class="lab">📝 Em resumo</p><p>${b.h}</p></div>`;
     case 'ul':case 'ol':return renderList(b);
     case 'chk':return '<div class="chk">'+b.items.map(it=>{const k=uid+'-c'+(CK++);return `<label><input type="checkbox" data-ck="${k}" ${S.chk[k]?'checked':''}><span>${it.h}</span></label>`;}).join('')+'</div>';
     case 'table':return `<div class="tw"><table><thead><tr>${b.head.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${b.rows.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')}</tbody></table></div>`;
