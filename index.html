@@ -546,6 +546,15 @@ body.sideopen .sidenav{transform:none;box-shadow:0 24px 60px rgba(0,0,0,.32)}
 .sn-link{display:block;padding:.45rem 1rem;color:var(--ink);text-decoration:none;font-size:.9rem;font-weight:600}
 .sn-link:hover{background:var(--soft)}
 .sn-link.active{color:var(--accent-2);background:var(--accent-dim)}
+.sn-meta{display:block;font-family:var(--f-mono);font-size:.66rem;color:var(--faint);margin-top:.2rem;letter-spacing:.02em}
+
+/* ===== Itens tipados + duração ===== */
+.mod-agg{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);margin:.3rem 0 1.1rem;padding:.45rem .75rem;background:var(--soft);border:1px solid var(--line);border-radius:8px;display:inline-block}
+.lmeta{display:block;font-family:var(--f-mono);font-size:.72rem;color:var(--faint);margin-top:.15rem;font-weight:400}
+.ltype{margin-right:.4rem}
+.lesson.lk-exercicio .ltype{color:var(--orange)}
+.lesson.lk-video .ltype{color:var(--ref-r)}
+.lesson.lk-leitura .ltype{color:var(--accent)}
 
 /* ===== Página Notas ===== */
 .nota-mod{margin:1.4rem 0}
@@ -959,6 +968,21 @@ function groupByTier(secs){
   secs.forEach(s=>{const t=sectionTier(s.t);if(!cur||cur.tier!==t){cur={tier:t,items:[]};out.push(cur);}cur.items.push(s);});
   return out;
 }
+/* ---------- Itens tipados + duração estimada (estilo Coursera) ---------- */
+/* Cada seção (h2) recebe um tipo e uma duração de leitura estimada pela contagem de palavras.
+   O sid já foi atribuído acima; aqui só enriquecemos os objetos, sem alterar numeração. */
+U.forEach(u=>{
+  const byS={};u.secs.forEach(s=>byS[s.id]=s);
+  const wc=b=>{let t='';if(b.h)t+=' '+b.h;if(b.lab)t+=' '+b.lab;if(Array.isArray(b.items))t+=' '+b.items.join(' ');if(Array.isArray(b.head))t+=' '+b.head.join(' ');if(Array.isArray(b.rows))t+=' '+b.rows.map(r=>Array.isArray(r)?r.join(' '):r).join(' ');if(b.cap)t+=' '+b.cap;return strip(t).split(/\s+/).filter(Boolean).length;};
+  let cur=null;const w2=bs=>bs.forEach(b=>{if(b.t==='h2')cur=byS[b.sid];else if(cur)cur._w=(cur._w||0)+wc(b);if(b.t==='call')w2(b.blocks);});
+  w2(u.blocks);
+  u.secs.forEach(s=>{const t4=sectionTier(s.t)===4;s.kind=t4?'exercicio':'leitura';s.hasVideo=!!VID_CUR[s.id];s.min=Math.max(1,Math.round((s._w||0)/180));});
+});
+function itemIcon(k){return k==='exercicio'?'✎':'📖';}
+function itemLabel(k){return k==='exercicio'?'Prática':'Leitura';}
+function secMeta(s){return itemLabel(s.kind)+' • '+s.min+' min'+(s.hasVideo?' • ▶ vídeo':'');}
+function modSummaryHTML(u){const secs=u.secs||[];const readMin=secs.filter(s=>s.kind!=='exercicio').reduce((a,s)=>a+(s.min||0),0);const vids=secs.filter(s=>s.hasVideo).length;const ex=secs.filter(s=>s.kind==='exercicio').length;const parts=['📖 ~'+readMin+' min de leitura'];if(vids)parts.push('▶ '+vids+(vids>1?' vídeos':' vídeo'));if(ex)parts.push('✎ '+ex+(ex>1?' práticas':' prática'));return '<p class="mod-agg">'+parts.join(' · ')+'</p>';}
+function sideMetaMini(u){const secs=u.secs||[];const vids=secs.filter(s=>s.hasVideo).length;const ex=secs.filter(s=>s.kind==='exercicio').length;const rd=secs.length-ex;const a=[];if(rd)a.push('📖 '+rd);if(vids)a.push('▶ '+vids);if(ex)a.push('✎ '+ex);return a.join('&nbsp;&nbsp;');}
 const MOD_ORDER=['m1','m2','m4','m17','m6','m3','m7','m13','m5','m15','m8','m11','m12','m14','m9','m10','m16'];
 const JOB_REQ={"m1-s1": "Análise de dados", "m1-s3": "Tipos de análise", "m1-s6": "KPIs e métricas", "m1-s12": "Tradução de problemas de negócio", "m2-s1": "Organização de dados (Excel)", "m2-s3": "Excel: fórmulas", "m2-s4": "Excel: funções lógicas", "m2-s5": "Excel: agregações condicionais", "m2-s6": "Excel: PROCV/PROCX", "m2-s10": "Excel: tabela dinâmica", "m2-s11": "Power Query (ETL no Excel)", "m2-s12": "Excel: dashboards", "m3-s1": "Amostragem", "m3-s4": "Estatística descritiva", "m3-s5": "Dispersão", "m3-s6": "Probabilidade", "m3-s13": "Testes de hipótese", "m3-s16": "Correlação", "m3-s18": "Regressão linear", "m4-s1": "SQL", "m4-s2": "SQL (SELECT/WHERE)", "m4-s3": "SQL (GROUP BY)", "m4-s4": "SQL (JOINs)", "m4-s8": "SQL (CASE WHEN)", "m4-s10": "SQL (pivot)", "m4-s12": "SQL (subqueries/CTEs)", "m4-s13": "SQL (window functions)", "m4-s17": "SQL (nulos/datas)", "m4-s18": "SQL em nuvem/dialetos", "m4-s19": "SQL (performance)", "m4-s20": "Raciocínio em SQL", "m5-s1": "BI e dashboards", "m5-s2": "Power BI", "m5-s3": "Modelagem estrela", "m5-s4": "DAX", "m5-s5": "DAX (CALCULATE)", "m5-s6": "Inteligência de tempo (DAX)", "m5-s7": "Visuais e interatividade", "m5-s10": "Design de dashboards", "m5-s11": "Storytelling", "m5-s12": "Tableau e outras ferramentas", "m6-s1": "Ambiente Python", "m6-s2": "Python", "m6-s3": "Pandas", "m6-s4": "Pandas (leitura)", "m6-s5": "Pandas (filtros)", "m6-s6": "Pandas (merge)", "m6-s7": "Pandas (groupby)", "m6-s9": "Pandas (pivot)", "m6-s10": "Limpeza de dados", "m6-s12": "NumPy", "m6-s18": "Visualização (Matplotlib/Seaborn)", "m6-s19": "Consumo de APIs", "m6-s21": "Automação com Python", "m7-s1": "Qualidade de dados", "m7-s2": "Data profiling", "m7-s3": "Limpeza de dados", "m7-s4": "Normalização", "m7-s5": "Modelagem dimensional", "m7-s7": "Esquema estrela", "m7-s9": "SCD", "m7-s10": "Estrela x floco", "m7-s12": "ETL / ELT", "m7-s13": "Governança de dados", "m7-s16": "Segurança e acesso", "m8-s1": "Git", "m8-s4": "Git (comandos)", "m8-s5": "GitHub", "m8-s8": "Cloud (AWS/GCP/Azure)", "m8-s9": "Orquestração (Airflow)", "m8-s10": "Docker", "m8-s13": "BigQuery", "m8-s14": "Databricks", "m9-s1": "Comunicação executiva", "m9-s3": "Apresentação e storytelling", "m9-s4": "Gestão de stakeholders", "m9-s12": "LGPD", "m11-s1": "IA / Machine Learning", "m11-s3": "Projeto de ML", "m11-s12": "Prompt engineering / IA generativa", "m12-s4": "Testes A/B", "m12-s10": "Forecasting", "m12-s13": "Spark / Big Data", "m13-s1": "Modelagem relacional", "m13-s5": "Normalização", "m13-s6": "DDL (SQL)", "m13-s9": "DML (SQL)", "m13-s11": "Consultas analíticas (SQL)", "m13-s18": "OLTP/OLAP e índices", "m13-s26": "Pipeline de ETL", "m13-s27": "Camadas bronze/prata/ouro", "m13-s30": "dbt", "m13-s35": "DW / Data Lake / Lakehouse", "m13-s36": "Analytics Engineering", "m14-s2": "DRE", "m14-s3": "Margem", "m14-s6": "Unit economics", "m14-s7": "Métricas de varejo", "m14-s8": "Métricas de SaaS", "m15-s1": "Power BI Service", "m15-s3": "Gateway / atualização", "m15-s4": "RLS (segurança)", "m15-s10": "Tableau", "m15-s11": "Governança de BI", "m15-s12": "Certificação PL-300", "m16-s1": "Engenharia de dados", "m16-s7": "Ciclo de vida (eng. dados)", "m16-s8": "Etapas do pipeline", "m16-s11": "Gestão de dados", "m16-s13": "Orquestração (Airflow)", "m16-s18": "DW/Lake/Lakehouse/Mesh", "m16-s27": "Ingestão (batch/stream)", "m16-s29": "Transformação (ETL)", "m17-s1": "Lógica de programação", "m17-s2": "Programação para analistas", "m17-s10": "Condicionais", "m17-s11": "Laços (while)", "m17-s12": "Laços (for)", "m17-s13": "Funções", "m17-s16": "Listas", "m17-s17": "Dicionários", "m17-s19": "Arquivos", "m17-s20": "Tratamento de erros"};
 function jobTag(sid){return JOB_REQ[sid]?' <span class="job-tag" title="'+JOB_REQ[sid]+' \u2014 requisito/qualifica\u00e7\u00e3o citada em vagas de Analista de Dados">Requisitado em vagas</span>':'';}
@@ -1035,7 +1059,7 @@ function buildSideNav(active){
   const row=(mid,i)=>{const u=byId[mid];if(!u)return '';const p=sidePct(u);const dn=modIsDone(u);
     return `<a class="sn-mod${active===mid?' active':''}${dn?' done':''}" href="#/u/${u.id}" style="--mc:${u.color||'var(--accent)'}">`
       +`<span class="sn-ck" aria-hidden="true">${dn?'✔':(i!=null?i+1:'•')}</span>`
-      +`<span class="sn-tx"><b>${esc(u.title)}</b><span class="sn-bar" aria-hidden="true"><i style="width:${p}%"></i></span></span>`
+      +`<span class="sn-tx"><b>${esc(u.title)}</b><span class="sn-bar" aria-hidden="true"><i style="width:${p}%"></i></span><span class="sn-meta">${sideMetaMini(u)}</span></span>`
       +`<span class="sn-pc">${secDone(u)}/${u.secs.length}</span></a>`;};
   const extras=['apresentacao','projetos','glossario','referencias','checklist'];
   let h='<div class="sn-head">Minha trilha</div>';
@@ -1465,7 +1489,8 @@ function renderCourse(uid){
     <div><h1>${esc(u.title)}</h1>${blurb?`<p class="sub" style="margin-top:.5rem;max-width:52ch">${esc(blurb)}</p>`:''}</div>
     ${n>1?`<div class="ring"><svg width="70" height="70"><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="35" cy="35" r="${r}" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg><div class="ring-txt"><b>${k}/${n}</b><span>AULAS</span></div></div>`:''}
   </div>
-  ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}</div>${S.diff&&S.diff[s.id]?`<span class="diff-mark d${S.diff[s.id]}" style="margin-left:auto">${DIFF_MARK[S.diff[s.id]]}</span>`:''}</a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
+  ${n&&u.kind==='mod'?modSummaryHTML(u):''}
+  ${n?`<div class="lesson-list">${groups.map(g=>`<div class="lgroup-label">${esc(TIER_LABEL[g.tier])}</div>`+g.items.map(s=>`<a class="lesson lk-${s.kind||'leitura'}${S.sec[s.id]?' done':''}" href="#/u/${uid}/${s.id}"><div class="lchk"></div><div class="lnum">${esc(s.n||'')}</div><div class="ltitle">${esc(s.t)}<span class="lmeta"><span class="ltype" aria-hidden="true">${itemIcon(s.kind)}</span>${esc(secMeta(s))}</span></div>${S.diff&&S.diff[s.id]?`<span class="diff-mark d${S.diff[s.id]}" style="margin-left:auto">${DIFF_MARK[S.diff[s.id]]}</span>`:''}</a>`).join('')).join('')}</div>`:R(u.blocks,uid)}
   <div class="meta" style="margin-top:1.4rem">${u.kind==='mod'||uid==='projetos'?`<button class="btn ${dd?'':'primary'}" id="donebtn" aria-pressed="${!!dd}">${dd?'✔ Concluído em '+fmtD(dd):'Marcar módulo como concluído'}</button>`:''}<button class="btn" id="bmbtn" aria-pressed="${!!S.bm[uid]}">${S.bm[uid]?'★ Nos favoritos':'☆ Favoritar'}</button></div>
   ${curVideoHTML(uid)}
   <h2 id="notas"><span class="hn2 nb">✎</span><span>Minhas anotações</span></h2>
